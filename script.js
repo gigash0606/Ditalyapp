@@ -114,7 +114,14 @@ function backToTables() {
     document.getElementById('tableGrid').style.display = 'grid';
     document.getElementById('orderInterface').style.display = 'none';
     document.getElementById('headerTitle').querySelector('.header-center').innerText = "Tische";
-    document.getElementById('numSearch').value = "";
+    const input = document.getElementById('numSearch');
+    input.value = "";
+    input.inputMode = 'decimal';
+    const btn = document.getElementById('kbToggle');
+    if (btn) {
+        btn.classList.remove('active');
+        btn.innerText = '⌨️';
+    }
     document.getElementById('searchResults').innerHTML = "";
     generateTables();
 }
@@ -260,20 +267,39 @@ function searchMenu() {
     );
     matches.forEach(item => {
         const orderItem = currentItems.find(i => i.id === item.id);
-        const qtyLabel = orderItem ? `<span style="background:var(--primary); color:white; padding:10px 30px; border-radius:40px; font-size:3.6rem; font-weight:800;">${orderItem.quantity}x</span>` : "";
+        const qtyLabel = orderItem ? `<span style="background:var(--primary); color:white; padding:10px 30px; border-radius:40px; font-size:2.8rem; font-weight:800;">${orderItem.quantity}x</span>` : "";
 
         const div = document.createElement('div');
         div.className = 'result-item';
         div.innerHTML = `
             <div style="display:flex; align-items:center; gap:30px; flex:1;">
-                <span style="color:var(--primary); font-weight:900; min-width:80px; font-size:3rem;">${item.id}</span>
-                <span style="font-weight:800; font-size:3rem;">${item.name}</span>
+                <span style="color:var(--primary); font-weight:900; min-width:80px; font-size:2.5rem;">${item.id}</span>
+                <span style="font-weight:800; font-size:2.5rem;">${item.name}</span>
             </div>
             ${qtyLabel}
         `;
         div.onclick = () => addToOrder(item);
         resultsDiv.appendChild(div);
     });
+}
+
+function toggleKeyboard() {
+    const input = document.getElementById('numSearch');
+    const btn = document.getElementById('kbToggle');
+
+    if (input.inputMode === 'decimal') {
+        input.inputMode = 'text';
+        btn.classList.add('active');
+        btn.innerText = 'Abc'; // Show text-mode indicator
+    } else {
+        input.inputMode = 'decimal';
+        btn.classList.remove('active');
+        btn.innerText = '⌨️'; // Show keyboard emoji
+    }
+
+    // Briefly blur and refocus to trigger the keyboard change on mobile
+    input.blur();
+    setTimeout(() => input.focus(), 50);
 }
 
 function addToOrder(item) {
@@ -328,7 +354,7 @@ function renderOrder() {
     const items = allOrders[currentTable] || [];
 
     if (items.length === 0) {
-        container.innerHTML = '<div style="padding:40px; color:#aaa; text-align:center; font-size: 3rem;">Keine Bestellung</div>';
+        container.innerHTML = '<div style="padding:40px; color:#aaa; text-align:center; font-size: 2.2rem;">Keine Bestellung</div>';
         return;
     }
 
