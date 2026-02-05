@@ -11,8 +11,8 @@
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-    --font-scale: 2.5;
-    /* Doubled scale for harmonic oversized UI */
+    --font-scale: 3.2;
+    /* Extreme harmonic scale for maximum visibility */
 }
 
 /* Base styles and mobile optimization */
@@ -212,15 +212,15 @@ header {
     border: 2px solid #eee;
     border-radius: 16px;
     margin-bottom: 30px;
-    max-height: 400px;
+    max-height: 600px;
     overflow-y: auto;
 }
 
 .result-item {
-    padding: 25px 30px;
-    border-bottom: 1px solid #eee;
+    padding: 35px 40px;
+    border-bottom: 2px solid #eee;
     cursor: pointer;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
