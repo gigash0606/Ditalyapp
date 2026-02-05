@@ -14,6 +14,16 @@ document.addEventListener('DOMContentLoaded', () => {
         navigator.serviceWorker.register('sw.js')
             .then(() => console.log('Service Worker Registered'));
     }
+
+    // Completely disable double-tap zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (event) => {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
 });
 
 
@@ -434,13 +444,13 @@ function clearTable() {
 
 // Custom Modal Implementation
 function customAlert(title, message) {
-    showModal(title, message, [{ text: "✓", primary: true }]);
+    showModal(title, message, [{ text: "✔", primary: true }]);
 }
 
 function customConfirm(title, message, callback) {
     showModal(title, message, [
-        { text: "✕", primary: false, onClick: () => callback(false) },
-        { text: "✓", primary: true, onClick: () => callback(true) }
+        { text: "✖", primary: false, onClick: () => callback(false) },
+        { text: "✔", primary: true, onClick: () => callback(true) }
     ]);
 }
 
@@ -451,9 +461,9 @@ function customPrompt(title, message, callback) {
         <input type="number" id="${inputId}" class="search-box" style="text-align:center;" inputmode="numeric" autofocus>
     `;
     showModal(title, bodyContent, [
-        { text: "✕", primary: false, onClick: () => callback(null) },
+        { text: "✖", primary: false, onClick: () => callback(null) },
         {
-            text: "✓", primary: true, onClick: () => {
+            text: "✔", primary: true, onClick: () => {
                 const val = document.getElementById(inputId).value;
                 callback(val);
             }
@@ -468,12 +478,12 @@ function customTextPrompt(title, message, callback) {
         <input type="text" id="${inputId}" class="search-box" style="text-align:center;" autofocus autocomplete="off">
     `;
     showModal(title, bodyContent, [
-        { text: "✕", primary: false, onClick: () => callback(null) },
+        { text: "✖", primary: false, onClick: () => callback(null) },
         {
             text: "🗑️", primary: false, onClick: () => callback("")
         },
         {
-            text: "✓", primary: true, onClick: () => {
+            text: "✔", primary: true, onClick: () => {
                 const val = document.getElementById(inputId).value;
                 callback(val);
             }
