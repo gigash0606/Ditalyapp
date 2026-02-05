@@ -122,11 +122,127 @@ function backToTables() {
 
 // ... Menu and Order logic remains similar but optimized ...
 const menu = [
-    { id: 1, name: "Cola" },
-    { id: 2, name: "Wasser" },
-    { id: 3, name: "Bier" },
-    { id: 10, name: "Burger" },
-    { id: 11, name: "Pizza" }
+    // Food Items
+    { id: 100, name: "CARPACCIO DIE MANZO" },
+    { id: 101, name: "VITELLO TONNATO" },
+    { id: 102, name: "FORMAGGIO DI CAPRA" },
+    { id: 103, name: "ANTIPASTO DELLA CASA" },
+    { id: 104, name: "CAPRESE DIE BUFALA" },
+    { id: 105, name: "BRUSCHETTA CLASSICA" },
+    { id: 106, name: "BRUSCHETTA CAPRESE" },
+    { id: 111, name: "INSALATA TONNO" },
+    { id: 112, name: "INSALATA CAPRICCIOSA" },
+    { id: 115, name: "INSALATA DI POLLO" },
+    { id: 116, name: "INSALATA MISTA" },
+    { id: 117, name: "TARTARE DI MANZO" },
+    { id: 118, name: "TARTARE DI SALMONE" },
+    { id: 120, name: "ZUPPA DI POMODORO" },
+    { id: 121, name: "MINESTRONE" },
+    { id: 200, name: "SPAGHETTI AGLIO OLIO E PERONCINO" },
+    { id: 201, name: "PENNE ARRABIATA" },
+    { id: 202, name: "TAGLIATELLE AL RAGÙ" },
+    { id: 203, name: "SPAGHETTI ALLA CARBONARA" },
+    { id: 204, name: "SPAGHETTI DEL PESCATORE" },
+    { id: 205, name: "RISOTTO STRACCIATA DI BUFALA E PORCINI" },
+    { id: 206, name: "GNOCCHI ALLA SORRENTINA" },
+    { id: 207, name: "FILEJA ALLA MONZESE" },
+    { id: 208, name: "RAVIOLI BURRATA" },
+    { id: 209, name: "RAVIOLI PERE E GORGONZOLA" },
+    { id: 210, name: "FILEJA MANZO E RUCOLA" },
+    { id: 211, name: "LASAGNE" },
+    { id: 212, name: "SPAGHETTI AI GAMBERI" },
+    { id: 213, name: "TAGLIATELLE SALMONE" },
+    { id: 214, name: "PENNE ALLA CACCIATORA" },
+    { id: 215, name: "SPAGHETTI PUTTANESCA CON ΤΟΝΝΟ" },
+    { id: 300, name: "MARGHERITA" },
+    { id: 301, name: "SALAME" },
+    { id: 302, name: "PROSCIUTTO E FUNGHI" },
+    { id: 304, name: "PARMIGIANA" },
+    { id: 305, name: "SALSICCIA" },
+    { id: 306, name: "VEGETARIANA" },
+    { id: 307, name: "DIAVOLA" },
+    { id: 308, name: "SFIZIOSA" },
+    { id: 309, name: "BUFALINA" },
+    { id: 310, name: "RUSTICA" },
+    { id: 312, name: "LE QUATTRO STAGIONI" },
+    { id: 313, name: "QUATTRO FORMAGGI" },
+    { id: 314, name: "SALMONE (PIZZA)" },
+    { id: 315, name: "D'ITALY (PIZZA)" },
+    { id: 316, name: "ZOLA E PARMA" },
+    { id: 317, name: "ΤΟΝΝO E CIPOLLA" },
+    { id: 400, name: "SALTIMBOCCA ALLA ROMANA" },
+    { id: 401, name: "FILETTO ALLA GRIGLIA" },
+    { id: 402, name: "FILETTO AL PEPE VERDE" },
+    { id: 403, name: "POLLO ALLA GRIGLIA" },
+    { id: 404, name: "CARRÉ DI AGNELLO" },
+    { id: 405, name: "ENTRECÔTE DI MANZO" },
+    { id: 406, name: "SALMONE ALLA GRIGLIA" },
+    { id: 407, name: "POLPO ALLA GRIGLIA" },
+    { id: 415, name: "TIRAMISU" },
+    { id: 416, name: "ΡΑΝΝΑ COTTA" },
+    { id: 417, name: "TORTINO AL CIOCCOLATO" },
+    { id: 418, name: "CRÈME BRÛLÉE" },
+
+    // Drink Items
+    { id: 1, name: "APEROL SPRITZ" },
+    { id: 2, name: "CAMPARI SPRITZ" },
+    { id: 3, name: "CAMPARI AMALFI" },
+    { id: 4, name: "PROSECCO" },
+    { id: 5, name: "SARTI SPRITZ" },
+    { id: 6, name: "SARTI LEMON" },
+    { id: 7, name: "LIMONCELLO SPRITZ" },
+    { id: 8, name: "GIN & TONIC" },
+    { id: 9, name: "MARTINI BIANCO" },
+    { id: 10, name: "HUGO" },
+    { id: 11, name: "CRODINO | alkoholfrei" },
+    { id: 12, name: "LAVANDA SPRITZ | alkoholfrei" },
+    { id: 13, name: "LIMOADE SPRITZ | alkoholfrei" },
+    { id: 20, name: "AQUA PANNA (STILL)" },
+    { id: 21, name: "SAN PELLEGRINO (MEDIUM)" },
+    { id: 22, name: "COCA COLA" },
+    { id: 23, name: "SPRITE" },
+    { id: 24, name: "FANTA" },
+    { id: 25, name: "SPEZI" },
+    { id: 26, name: "GINGER ALE" },
+    { id: 27, name: "TONIC WATER" },
+    { id: 28, name: "BITTER LEMON" },
+    { id: 29, name: "BANANENSAFT" },
+    { id: 30, name: "ORANGENSAFT" },
+    { id: 31, name: "KIRSCHSAFT" },
+    { id: 32, name: "APFELSAFT" },
+    { id: 33, name: "RHABARBERSAFT" },
+    { id: 34, name: "JOHANNISBEERSAFT" },
+    { id: 35, name: "KIBA" },
+    { id: 50, name: "ROTWEIN" },
+    { id: 51, name: "WEISSWEIN" },
+    { id: 52, name: "ROSÉ" },
+    { id: 53, name: "FRIZZANTINO" },
+    { id: 54, name: "LAMBRUSCO" },
+    { id: 55, name: "WEISSWEINSCHORLE" },
+    { id: 56, name: "PRIMITIVO" },
+    { id: 57, name: "CHIANTI CLASSICO" },
+    { id: 58, name: "CHARDONNAY" },
+    { id: 59, name: "PINOT GRIGIO" },
+    { id: 70, name: "GRAPPA" },
+    { id: 71, name: "LIMONCELLO" },
+    { id: 72, name: "AVERNA" },
+    { id: 73, name: "RAMAZOTTI" },
+    { id: 74, name: "AMARO DEL CAPO" },
+    { id: 75, name: "SAMBUCA" },
+    { id: 76, name: "FERNET BRANCHA" },
+    { id: 80, name: "CAFFE" },
+    { id: 81, name: "CAPPUCCINO" },
+    { id: 82, name: "LATTE MACCHIATO" },
+    { id: 83, name: "ESPRESSO" },
+    { id: 84, name: "ESPRESSO DOPPIO" },
+    { id: 85, name: "ESPRESSO MACCHIATO" },
+    { id: 86, name: "TEE" },
+    { id: 90, name: "PAULANDER PILS" },
+    { id: 91, name: "PAULANER WEISSBIER" },
+    { id: 92, name: "RADLER" },
+    { id: 93, name: "PAULANER HEFEWEIZEN DUNKEL" },
+    { id: 94, name: "PAULANER PILS alkoholfrei" },
+    { id: 95, name: "PAULANER WEISSBIER alkoholfrei" }
 ];
 
 function searchMenu() {
@@ -162,34 +278,40 @@ function searchMenu() {
 
 function addToOrder(item) {
     if (!allOrders[currentTable]) allOrders[currentTable] = [];
-    const existingItem = allOrders[currentTable].find(i => i.id === item.id);
-    if (existingItem) {
-        existingItem.quantity = (existingItem.quantity || 1) + 1;
+    // Only stack if there is no comment
+    const existingEntry = allOrders[currentTable].find(i => i.id === item.id && !i.comment);
+    if (existingEntry) {
+        existingEntry.quantity = (existingEntry.quantity || 1) + 1;
     } else {
-        allOrders[currentTable].push({ ...item, quantity: 1 });
+        allOrders[currentTable].push({
+            ...item,
+            quantity: 1,
+            comment: "",
+            uid: Date.now() + Math.random()
+        });
     }
     saveAndRender();
     document.getElementById('numSearch').value = "";
     document.getElementById('searchResults').innerHTML = "";
 }
 
-function updateQuantity(itemId, delta) {
-    const item = allOrders[currentTable].find(i => i.id === itemId);
+function updateQuantity(uid, delta) {
+    const item = allOrders[currentTable].find(i => i.uid === uid);
     if (!item) return;
     item.quantity = (item.quantity || 1) + delta;
     if (item.quantity <= 0) {
-        allOrders[currentTable] = allOrders[currentTable].filter(i => i.id !== itemId);
+        allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
     }
     saveAndRender();
 }
 
-function removeFromOrder(itemId) {
-    const item = allOrders[currentTable].find(i => i.id === itemId);
+function removeFromOrder(uid) {
+    const item = allOrders[currentTable].find(i => i.uid === uid);
     const itemName = item ? item.name : "Artikel";
 
     customConfirm("Artikel entfernen", `Möchten Sie ${itemName} wirklich aus der Bestellung entfernen?`, (confirmed) => {
         if (confirmed) {
-            allOrders[currentTable] = allOrders[currentTable].filter(i => i.id !== itemId);
+            allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
             saveAndRender();
         }
     });
@@ -214,16 +336,64 @@ function renderOrder() {
         const div = document.createElement('div');
         div.className = 'order-row';
         div.innerHTML = `
-            <span class="item-name"><span style="color:var(--primary); font-weight:bold;">${item.id}.</span> ${item.name}</span>
+            <div class="item-info">
+                <span class="item-name"><span style="color:var(--primary); font-weight:bold;">${item.id}.</span> ${item.name}</span>
+                ${item.comment ? `<div class="item-comment">${item.comment}</div>` : ""}
+            </div>
             <div class="item-controls">
-                <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
-                <span class="qty-val">${item.quantity}</span>
-                <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
-                <button class="del-btn" onclick="removeFromOrder(${item.id})">✕</button>
+                <button class="comment-btn" onclick="editComment(${item.uid})">📝</button>
+                <div class="qty-group">
+                    <button class="qty-btn" onclick="updateQuantity(${item.uid}, -1)">-</button>
+                    <span class="qty-val">${item.quantity}</span>
+                    <button class="qty-btn" onclick="updateQuantity(${item.uid}, 1)">+</button>
+                </div>
+                <button class="del-btn" onclick="removeFromOrder(${item.uid})">✕</button>
             </div>
         `;
         container.appendChild(div);
     });
+}
+
+function editComment(uid) {
+    const item = allOrders[currentTable].find(i => i.uid === uid);
+    if (!item) return;
+
+    customTextPrompt("Kommentar", `Kommentar für ${item.name}:`, (newComment) => {
+        if (newComment === null) return;
+
+        // If it's a stack (qty > 1), split it
+        if (item.quantity > 1) {
+            item.quantity -= 1;
+            allOrders[currentTable].push({
+                ...item,
+                quantity: 1,
+                comment: newComment,
+                uid: Date.now() + Math.random()
+            });
+        } else {
+            item.comment = newComment;
+        }
+
+        // After updating/splitting, try to re-stack with existing items with the same ID and same comment
+        restackItems();
+        saveAndRender();
+    });
+}
+
+function restackItems() {
+    const items = allOrders[currentTable] || [];
+    const stacked = [];
+
+    items.forEach(item => {
+        const existing = stacked.find(s => s.id === item.id && s.comment === item.comment);
+        if (existing) {
+            existing.quantity += item.quantity;
+        } else {
+            stacked.push(item);
+        }
+    });
+
+    allOrders[currentTable] = stacked;
 }
 
 function clearTable() {
@@ -256,6 +426,26 @@ function customPrompt(title, message, callback) {
     `;
     showModal(title, bodyContent, [
         { text: "Abbrechen", primary: false, onClick: () => callback(null) },
+        {
+            text: "OK", primary: true, onClick: () => {
+                const val = document.getElementById(inputId).value;
+                callback(val);
+            }
+        }
+    ], true);
+}
+
+function customTextPrompt(title, message, callback) {
+    const inputId = "modalInput";
+    const bodyContent = `
+        <p style="margin-bottom:30px;">${message}</p>
+        <input type="text" id="${inputId}" class="search-box" style="text-align:center;" autofocus autocomplete="off">
+    `;
+    showModal(title, bodyContent, [
+        { text: "Abbrechen", primary: false, onClick: () => callback(null) },
+        {
+            text: "Leeren", primary: false, onClick: () => callback("")
+        },
         {
             text: "OK", primary: true, onClick: () => {
                 const val = document.getElementById(inputId).value;

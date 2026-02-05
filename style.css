@@ -237,27 +237,57 @@ header {
 
 .order-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 0;
+    flex-direction: column;
+    gap: 15px;
+    padding: 30px 0;
     border-bottom: 2px solid #f0f0f0;
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .item-name {
     font-weight: 600;
     font-size: 3rem;
+    line-height: 1.2;
+}
+
+.item-comment {
+    font-size: 2.2rem;
+    color: var(--primary);
+    font-weight: 600;
+    background: #f0f9f8;
+    padding: 10px 20px;
+    border-radius: 12px;
+    display: inline-block;
+    width: fit-content;
+    margin-top: 5px;
 }
 
 .item-controls {
     display: flex;
     align-items: center;
-    gap: 24px;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+}
+
+.qty-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f8f9fa;
+    padding: 5px;
+    border-radius: 30px;
 }
 
 .qty-btn {
-    width: 110px;
-    height: 110px;
-    border-radius: 24px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
     border: none;
     background: #f0f2f5;
     color: var(--text);
@@ -276,17 +306,35 @@ header {
 .qty-val {
     font-size: 3.2rem;
     font-weight: 700;
-    min-width: 80px;
+    min-width: 70px;
     text-align: center;
+}
+
+.comment-btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #e0e0e0;
+    background: white;
+    font-size: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.comment-btn:active {
+    background: #f0f2f5;
+    transform: scale(0.9);
 }
 
 .del-btn {
     background: #fff5f5;
     color: var(--danger);
     border: none;
-    padding: 0 30px;
-    height: 110px;
-    border-radius: 24px;
+    padding: 0 35px;
+    height: 100px;
+    border-radius: 50%;
     font-size: 3rem;
     font-weight: bold;
 }
@@ -384,6 +432,7 @@ header {
 
 .modal-footer {
     display: flex;
+    flex-wrap: wrap;
     border-top: 1px solid #eee;
 }
 
