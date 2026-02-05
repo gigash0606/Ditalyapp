@@ -144,11 +144,17 @@ function searchMenu() {
     );
     matches.forEach(item => {
         const orderItem = currentItems.find(i => i.id === item.id);
-        const qtyLabel = orderItem ? `<span style="background:var(--primary); color:white; padding:2px 10px; border-radius:10px; margin-left:10px; font-size:1rem;">${orderItem.quantity}</span>` : "";
+        const qtyLabel = orderItem ? `<span style="background:var(--primary); color:white; padding:5px 15px; border-radius:20px; font-size:1.1rem; font-weight:bold;">${orderItem.quantity}x</span>` : "";
 
         const div = document.createElement('div');
         div.className = 'result-item';
-        div.innerHTML = `<strong>${item.id}</strong>. ${item.name} ${qtyLabel}`;
+        div.innerHTML = `
+            <div style="display:flex; align-items:center; gap:15px; flex:1;">
+                <span style="color:var(--primary); font-weight:bold; min-width:40px;">${item.id}</span>
+                <span style="font-weight:600;">${item.name}</span>
+            </div>
+            ${qtyLabel}
+        `;
         div.onclick = () => addToOrder(item);
         resultsDiv.appendChild(div);
     });
@@ -245,8 +251,8 @@ function customConfirm(title, message, callback) {
 function customPrompt(title, message, callback) {
     const inputId = "modalInput";
     const bodyContent = `
-        <p>${message}</p>
-        <input type="number" id="${inputId}" class="search-box" style="margin-top:10px; text-align:center;" inputmode="numeric" autofocus>
+        <p style="margin-bottom:20px;">${message}</p>
+        <input type="text" id="${inputId}" class="search-box" style="text-align:center;" autofocus>
     `;
     showModal(title, bodyContent, [
         { text: "Abbrechen", primary: false, onClick: () => callback(null) },
