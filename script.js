@@ -7,12 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
         selectTable(parseInt(savedTable));
     }
 
+
+
     // Register Service Worker
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
             .then(() => console.log('Service Worker Registered'));
     }
 });
+
+
 
 let tables = [];
 let allOrders = {};
@@ -36,7 +40,7 @@ function generateTables() {
     // "Add Table" Card
     const addCard = document.createElement('div');
     addCard.className = 'card add-table-card';
-    addCard.innerHTML = `<div style="font-size:48px; color:var(--accent-green); font-weight:bold;">+</div>`;
+    addCard.innerHTML = `<div style="font-size:3rem; color:var(--accent-green); font-weight:bold;">+</div>`;
     addCard.onclick = addTable;
     grid.appendChild(addCard);
 
@@ -47,7 +51,7 @@ function generateTables() {
         card.className = `card table-card ${hasOrder ? 'has-order' : ''}`;
 
         card.innerHTML = `
-            <div class="card-body" style="font-size: 48px; font-weight: bold; color: #444;">
+            <div class="card-body" style="font-size: 3rem; font-weight: bold; color: #444;">
                 ${num}
             </div>
         `;
@@ -96,7 +100,11 @@ function selectTable(num) {
     localStorage.setItem('waiterCurrentTable', num);
     document.getElementById('tableGrid').style.display = 'none';
     document.getElementById('orderInterface').style.display = 'block';
-    document.getElementById('headerTitle').innerText = "Tisch " + num;
+
+    // Safety check for header title element inside new layout
+    const titleEl = document.getElementById('headerTitle').querySelector('.header-center');
+    if (titleEl) titleEl.innerText = "Tisch " + num;
+
     renderOrder();
 }
 
@@ -105,7 +113,7 @@ function backToTables() {
     localStorage.removeItem('waiterCurrentTable');
     document.getElementById('tableGrid').style.display = 'grid';
     document.getElementById('orderInterface').style.display = 'none';
-    document.getElementById('headerTitle').innerText = "Tische";
+    document.getElementById('headerTitle').querySelector('.header-center').innerText = "Tische";
     document.getElementById('numSearch').value = "";
     document.getElementById('searchResults').innerHTML = "";
     generateTables();
