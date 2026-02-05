@@ -51,7 +51,7 @@ function generateTables() {
         card.className = `card table-card ${hasOrder ? 'has-order' : ''}`;
 
         card.innerHTML = `
-            <div class="card-body" style="font-size: 3.5rem; font-weight: bold; color: #444;">
+            <div class="card-body" style="font-size: 4.5rem; font-weight: bold; color: #444;">
                 ${num}
             </div>
         `;
@@ -208,7 +208,7 @@ function renderOrder() {
         const div = document.createElement('div');
         div.className = 'order-row';
         div.innerHTML = `
-            <span class="item-name"><span style="color:#888; font-size:0.9rem; font-weight:normal;">#${item.id}</span> ${item.name}</span>
+            <span class="item-name"><span style="color:var(--primary); font-weight:bold;">${item.id}.</span> ${item.name}</span>
             <div class="item-controls">
                 <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
                 <span class="qty-val">${item.quantity}</span>
