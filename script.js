@@ -35,11 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const updateViewport = () => {
             const v = window.visualViewport;
 
-            // 1. Sync the container to the visible window
+            // 1. Sync the container to the visible window height
             root.style.height = `${v.height}px`;
-            root.style.top = `${v.offsetTop}px`;
 
-            // 2. Force the browser window back to 0 to kill jumps
+            // 2. Clear any scrolling on the body/html to keep fixed elements stable
             if (window.scrollY !== 0) {
                 window.scrollTo(0, 0);
             }
@@ -381,7 +380,7 @@ function searchMenu() {
 
     const matches = menu.filter(item =>
         (idQuery !== '' && item.id.toString().startsWith(idQuery)) ||
-        item.name.toLowerCase().startsWith(query)
+        item.name.toLowerCase().includes(query)
     );
 
     // Sort result by ID numerically: lowest number up
