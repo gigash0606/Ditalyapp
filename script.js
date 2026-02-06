@@ -39,12 +39,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // This JS layer specifically catches what the browser ignores in "standalone" mode.
 
     // Focus logic: Rely on manual tapping for search focus to prevent accidental keyboard popups during scroll.
-    const searchInput = document.getElementById('numSearch');
-    if (searchInput) {
-        // Prevent browser from scrolling the whole window up when keyboard shows
-        searchInput.addEventListener('focus', () => {
+    // Keyboard / VisualViewport Anchor Logic
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            const h = window.visualViewport.height;
+            // Set a CSS variable for the visible height
+            document.documentElement.style.setProperty('--vh', `${h}px`);
+
+            // Force the app and header to stay at top=0
             window.scrollTo(0, 0);
             document.body.scrollTop = 0;
+
+            // If focused on search, ensure header is locked
+            if (document.activeElement && document.activeElement.id === 'numSearch') {
+                document.getElementById('headerTitle').style.top = '0';
+            }
+        });
+    }
+
+    const searchInput = document.getElementById('numSearch');
+    if (searchInput) {
+        searchInput.addEventListener('focus', () => {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.body.scrollTop = 0;
+            }, 50);
         });
     }
 });
@@ -562,7 +581,7 @@ function customPrompt(title, message, callback) {
     const inputId = "modalInput";
     const bodyContent = `
         <p style="margin-bottom:15px;">${message}</p>
-        <input type="number" id="${inputId}" class="search-box" style="text-align:center;" inputmode="numeric" autofocus>
+        <input type="number" id="${inputId}" class="modal-input" style="text-align:center;" inputmode="numeric" autofocus>
     `;
     showModal(title, bodyContent, [
         { text: "✖", primary: false, onClick: () => callback(null) },
@@ -579,7 +598,7 @@ function customTextPrompt(title, message, callback) {
     const inputId = "modalInput";
     const bodyContent = `
         <p style="margin-bottom:15px;">${message}</p>
-        <input type="text" id="${inputId}" class="search-box" style="text-align:center;" autofocus autocomplete="off">
+        <input type="text" id="${inputId}" class="modal-input" style="text-align:center;" autofocus autocomplete="off">
     `;
     showModal(title, bodyContent, [
         { text: "✖", primary: false, onClick: () => callback(null) },
