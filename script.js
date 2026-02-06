@@ -29,45 +29,39 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
     });
 
-    // Keyboard / VisualViewport Anchor Logic (Fixed Top Optimization)
+    // Keyboard / VisualViewport Anchor Logic (Buttery Smooth Fix)
     if (window.visualViewport) {
-        let ticking = false;
+        const root = document.getElementById('rootContainer');
         const updateViewport = () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    const v = window.visualViewport;
-                    const h = v.height;
+            const v = window.visualViewport;
 
-                    document.documentElement.style.setProperty('--vh', `${h}px`);
-                    document.body.style.height = `${h}px`;
+            // 1. Sync the container to the visible window
+            root.style.height = `${v.height}px`;
+            root.style.top = `${v.offsetTop}px`;
 
-                    // We FORCE the window back to 0 to keep the top stable
-                    if (window.scrollY !== 0) {
-                        window.scrollTo(0, 0);
-                    }
-
-                    const header = document.getElementById('headerTitle');
-                    if (header) {
-                        header.style.transform = 'none';
-                        header.style.top = '0';
-                    }
-
-                    ticking = false;
-                });
-                ticking = true;
+            // 2. Force the browser window back to 0 to kill jumps
+            if (window.scrollY !== 0) {
+                window.scrollTo(0, 0);
             }
         };
 
         window.visualViewport.addEventListener('resize', updateViewport);
         window.visualViewport.addEventListener('scroll', updateViewport);
-        window.addEventListener('scroll', updateViewport);
+
+        // Block manual window scrolling entirely
+        window.addEventListener('scroll', (e) => {
+            if (window.scrollY !== 0) {
+                window.scrollTo(0, 0);
+            }
+        }, { passive: false });
+
         updateViewport();
     }
 
     const searchInput = document.getElementById('numSearch');
     if (searchInput) {
         searchInput.addEventListener('focus', () => {
-            // Block any initial scroll jumps
+            // Block any initial scroll jumps when keyboard pops up
             setTimeout(() => {
                 window.scrollTo(0, 0);
                 document.body.scrollTop = 0;
@@ -205,11 +199,11 @@ function backToTables() {
 // ... Menu and Order logic remains similar but optimized ...
 const menu = [
     // FOOD
-    { id: 100, name: "CARPACCIO DIE MANZO" },
+    { id: 100, name: "CARPACCIO DI MANZO" },
     { id: 101, name: "VITELLO TONNATO" },
     { id: 102, name: "FORMAGGIO DI CAPRA" },
     { id: 103, name: "ANTIPASTO DELLA CASA" },
-    { id: 104, name: "CAPRESE DIE BUFALA" },
+    { id: 104, name: "CAPRESE DI BUFALA" },
     { id: 105, name: "BRUSCHETTA CLASSICA" },
     { id: 106, name: "BRUSCHETTA CAPRESE" },
     { id: 111, name: "INSALATA TONNO" },
@@ -220,7 +214,7 @@ const menu = [
     { id: 118, name: "TARTARE DI SALMONE" },
     { id: 120, name: "ZUPPA DI POMODORO" },
     { id: 121, name: "MINESTRONE" },
-    { id: 200, name: "SPAGHETTI AGLIO OLIO E PERONCINO" },
+    { id: 200, name: "SPAGHETTI AGLIO OLIO E PEPERONCINO" },
     { id: 201, name: "PENNE ARRABIATA" },
     { id: 202, name: "TAGLIATELLE AL RAGÙ" },
     { id: 203, name: "SPAGHETTI ALLA CARBONARA" },
@@ -235,7 +229,7 @@ const menu = [
     { id: 212, name: "SPAGHETTI AI GAMBERI" },
     { id: 213, name: "TAGLIATELLE SALMONE" },
     { id: 214, name: "PENNE ALLA CACCIATORA" },
-    { id: 215, name: "SPAGHETTI PUTTANESCA CON ΤΟΝΝΟ" },
+    { id: 215, name: "SPAGHETTI PUTTANESCA CON TONNO" },
     { id: 300, name: "PIZZA MARGHERITA" },
     { id: 301, name: "PIZZA SALAME" },
     { id: 302, name: "PIZZA PROSCIUTTO E FUNGHI" },
@@ -251,7 +245,14 @@ const menu = [
     { id: 314, name: "PIZZA SALMONE" },
     { id: 315, name: "PIZZA D'ITALY" },
     { id: 316, name: "PIZZA ZOLA E PARMA" },
-    { id: 317, name: "PIZZA ΤΟΝΝO E CIPOLLA" },
+    { id: 317, name: "PIZZA TONNO E CIPOLLA" },
+    { id: 324, name: "MONATS ANTIPASTI" },
+    { id: 325, name: "MONATS PASTA LA FORMA" },
+    { id: 326, name: "MONATS PASTA DEL MESE 1" },
+    { id: 327, name: "MONATS PASTA DEL MESE 2" },
+    { id: 328, name: "MONATS FISCH" },
+    { id: 329, name: "MONATS FLEISCH" },
+    { id: 330, name: "MONATS DESSERT" },
     { id: 400, name: "SALTIMBOCCA ALLA ROMANA" },
     { id: 401, name: "FILETTO ALLA GRIGLIA" },
     { id: 402, name: "FILETTO AL PEPE VERDE" },
@@ -261,7 +262,7 @@ const menu = [
     { id: 406, name: "SALMONE ALLA GRIGLIA" },
     { id: 407, name: "POLPO ALLA GRIGLIA" },
     { id: 415, name: "TIRAMISU" },
-    { id: 416, name: "ΡΑΝΝΑ COTTA" },
+    { id: 416, name: "PANNA COTTA" },
     { id: 417, name: "TORTINO AL CIOCCOLATO" },
     { id: 418, name: "CRÈME BRÛLÉE" },
 
@@ -279,78 +280,92 @@ const menu = [
     { id: 11, name: "CRODINO" },
     { id: 12, name: "LAVANDA SPRITZ" },
     { id: 13, name: "LIMOADE SPRITZ" },
-    { id: 20, name: "AQUA PANNA 0,25l" },
-    { id: 21, name: "AQUA PANNA 0,75l" },
-    { id: 22, name: "SAN PELLEGRINO 0,25l" },
-    { id: 23, name: "SAN PELLEGRINO 0,75l" },
-    { id: 24, name: "COCA COLA 0,2l" },
-    { id: 25, name: "COCA COLA 0,4l" },
-    { id: 26, name: "SPRITE 0,2l" },
-    { id: 27, name: "SPRITE 0,4l" },
-    { id: 28, name: "FANTA 0,2l" },
-    { id: 29, name: "FANTA 0,4l" },
-    { id: 30, name: "SPEZI 0,2l" },
-    { id: 31, name: "SPEZI 0,4l" },
-    { id: 32, name: "GINGER ALE 0,2l" },
-    { id: 33, name: "GINGER ALE 0,4l" },
-    { id: 34, name: "TONIC WATER 0,2l" },
-    { id: 35, name: "TONIC WATER 0,4l" },
-    { id: 36, name: "BITTER LEMON 0,2l" },
-    { id: 37, name: "BITTER LEMON 0,4l" },
-    { id: 38, name: "BANANENSAFT 0,2l" },
-    { id: 39, name: "BANANENSAFT 0,4l" },
-    { id: 40, name: "ORANGENSAFT 0,2l" },
-    { id: 41, name: "ORANGENSAFT 0,4l" },
-    { id: 42, name: "KIRSCHSAFT 0,2l" },
-    { id: 43, name: "KIRSCHSAFT 0,4l" },
-    { id: 44, name: "APFELSAFT 0,2l" },
-    { id: 45, name: "APFELSAFT 0,4l" },
-    { id: 46, name: "RHABARBERSAFT 0,2l" },
-    { id: 47, name: "RHABARBERSAFT 0,4l" },
-    { id: 48, name: "JOHANNISBEERSAFT 0,2l" },
-    { id: 49, name: "JOHANNISBEERSAFT 0,4l" },
-    { id: 50, name: "KIBA 0,2l" },
-    { id: 51, name: "KIBA 0,4l" },
-    { id: 60, name: "ROTWEIN 0,2l" },
-    { id: 61, name: "WEISSWEIN 0,2l" },
-    { id: 62, name: "ROSÉ 0,2l" },
-    { id: 63, name: "FRIZZANTINO 0,2l" },
-    { id: 64, name: "LAMBRUSCO 0,2l" },
-    { id: 65, name: "WEISSWEINSCHORLE 0,2l" },
-    { id: 66, name: "PRIMITIVO 0,2l" },
-    { id: 67, name: "CHIANTI CLASSICO 0,2l" },
-    { id: 68, name: "CHARDONNAY 0,2l" },
-    { id: 69, name: "PINOT GRIGIO 0,2l" },
-    { id: 70, name: "GRAPPA 2cl" },
-    { id: 71, name: "GRAPPA 4cl" },
-    { id: 72, name: "LIMONCELLO 2cl" },
-    { id: 73, name: "LIMONCELLO 4cl" },
-    { id: 74, name: "AVERNA 2cl" },
-    { id: 75, name: "AVERNA 4cl" },
-    { id: 76, name: "RAMAZOTTI 2cl" },
-    { id: 77, name: "RAMAZOTTI 4cl" },
-    { id: 78, name: "AMARO DEL CAPO 2cl" },
-    { id: 79, name: "AMARO DEL CAPO 4cl" },
-    { id: 80, name: "SAMBUCA 2cl" },
-    { id: 81, name: "SAMBUCA 4cl" },
-    { id: 82, name: "FERNET BRANCHA 2cl" },
-    { id: 83, name: "FERNET BRANCHA 4cl" },
-    { id: 84, name: "CAFFE" },
-    { id: 85, name: "CAPPUCCINO" },
-    { id: 86, name: "LATTE MACCHIATO" },
-    { id: 87, name: "ESPRESSO" },
-    { id: 88, name: "ESPRESSO DOPPIO" },
-    { id: 89, name: "ESPRESSO MACCHIATO" },
-    { id: 90, name: "TEE" },
-    { id: 91, name: "PAULANDER PILS 0,3l" },
-    { id: 92, name: "PAULANDER PILS 0,5l" },
-    { id: 93, name: "PAULANER WEISSBIER 0,3l" },
-    { id: 94, name: "PAULANER WEISSBIER 0,5l" },
-    { id: 95, name: "RADLER 0,3l" },
-    { id: 96, name: "RADLER 0,5l" },
-    { id: 97, name: "PAULANER HEFEWEIZEN DUNKEL 0,5l" },
-    { id: 98, name: "PAULANER PILS alkoholfrei 0,33l" },
-    { id: 99, name: "PAULANER WEISSBIER alkoholfrei 0,5l" }
+    { id: 14, name: "Sauvignon Blanc FLASCHE 0,75l" },
+    { id: 15, name: "Scalabrone FLASCHE 0,75l" },
+    { id: 20, name: "PAULANER PILS 0,3l" },
+    { id: 21, name: "PAULANER PILS 0,5l" },
+    { id: 22, name: "PAULANER WEISSBIER 0,3l" },
+    { id: 23, name: "PAULANER WEISSBIER 0,5l" },
+    { id: 26, name: "RADLER 0,3l" },
+    { id: 27, name: "RADLER 0,5l" },
+    { id: 31, name: "Bruciato FLASCHE 0,75l" },
+    { id: 32, name: "JOHANNISBEERSAFT 0,2l" },
+    { id: 33, name: "JOHANNISBEERSAFT 0,4l" },
+    { id: 34, name: "PAULANER WEISSBIER ALKOHOLFREI 0,5l" },
+    { id: 35, name: "PAULANER HEFEWEIZEN DUNKEL 0,5l" },
+    { id: 36, name: "PAULANER PILS ALKOHOLFREI 0,33l" },
+    { id: 40, name: "AQUA PANNA 0,25l" },
+    { id: 41, name: "AQUA PANNA 0,75l" },
+    { id: 42, name: "SAN PELLEGRINO 0,25l" },
+    { id: 43, name: "SAN PELLEGRINO 0,75l" },
+    { id: 44, name: "BANANENSAFT 0,2l" },
+    { id: 45, name: "BANANENSAFT 0,4l" },
+    { id: 46, name: "ORANGENSAFT 0,2l" },
+    { id: 47, name: "ORANGENSAFT 0,4l" },
+    { id: 48, name: "KIRSCHSAFT 0,2l" },
+    { id: 49, name: "KIRSCHSAFT 0,4l" },
+    { id: 50, name: "APFELSAFT 0,2l" },
+    { id: 51, name: "APFELSAFT 0,4l" },
+    { id: 52, name: "KIBA 0,2l" },
+    { id: 53, name: "KIBA 0,4l" },
+    { id: 54, name: "RHABARBERSAFT 0,2l" },
+    { id: 55, name: "RHABARBERSAFT 0,4l" },
+    { id: 56, name: "ROTWEIN 0,2l" },
+    { id: 57, name: "WEISSWEIN 0,2l" },
+    { id: 58, name: "ROSÉ 0,2l" },
+    { id: 59, name: "FRIZZANTINO 0,2l" },
+    { id: 60, name: "LAMBRUSCO 0,2l" },
+    { id: 61, name: "WEISSWEINSCHORLE 0,2l" },
+    { id: 62, name: "COCA COLA 0,2l" },
+    { id: 63, name: "COCA COLA 0,4l" },
+    { id: 64, name: "SPRITE 0,2l" },
+    { id: 65, name: "SPRITE 0,4l" },
+    { id: 66, name: "FANTA 0,2l" },
+    { id: 67, name: "FANTA 0,4l" },
+    { id: 68, name: "SPEZI 0,2l" },
+    { id: 69, name: "SPEZI 0,4l" },
+    { id: 70, name: "GINGER ALE 0,2l" },
+    { id: 71, name: "GINGER ALE 0,4l" },
+    { id: 72, name: "TONIC WATER 0,2l" },
+    { id: 73, name: "TONIC WATER 0,4l" },
+    { id: 74, name: "BITTER LEMON 0,2l" },
+    { id: 75, name: "BITTER LEMON 0,4l" },
+    { id: 80, name: "PRIMITIVO 0,2l" },
+    { id: 81, name: "CHIANTI CLASSICO 0,2l" },
+    { id: 82, name: "CHARDONNAY 0,2l" },
+    { id: 83, name: "PINOT GRIGIO 0,2l" },
+    { id: 85, name: "Vermentino FLASCHE 0,75l" },
+    { id: 86, name: "Chardonnay FLASCHE 0,75l" },
+    { id: 87, name: "Pinot Grigio FLASCHE 0,75l" },
+    { id: 88, name: "Lagrein Rosé FLASCHE 0,75l" },
+    { id: 90, name: "Chianti Classico FLASCHE 0,75l" },
+    { id: 91, name: "Primitivo FLASCHE 0,75l" },
+    { id: 97, name: "Lagrein Rot FLASCHE 0,75l" },
+    { id: 98, name: "Insoglio FLASCHE 0,75l" },
+    { id: 113, name: "Weissburgunder FLASCHE 0,75l" },
+    { id: 409, name: "AMARO DEL CAPO 2cl" },
+    { id: 410, name: "AMARO DEL CAPO 4cl" },
+    { id: 432, name: "Sodale FLASCHE 0,75l" },
+    { id: 500, name: "CAFFÈ" },
+    { id: 501, name: "CAPPUCCINO" },
+    { id: 502, name: "LATTE MACCHIATO" },
+    { id: 503, name: "ESPRESSO" },
+    { id: 504, name: "ESPRESSO DOPPIO" },
+    { id: 505, name: "ESPRESSO MACCHIATO" },
+    { id: 506, name: "TEE" },
+    { id: 507, name: "GRAPPA 2cl" },
+    { id: 508, name: "GRAPPA 4cl" },
+    { id: 509, name: "LIMONCELLO 2cl" },
+    { id: 510, name: "LIMONCELLO 4cl" },
+    { id: 511, name: "AVERNA 2cl" },
+    { id: 512, name: "AVERNA 4cl" },
+    { id: 513, name: "FERNET-BRANCA 2cl" },
+    { id: 514, name: "FERNET-BRANCA 4cl" },
+    { id: 515, name: "SAMBUCA 2cl" },
+    { id: 516, name: "SAMBUCA 4cl" },
+    { id: 517, name: "Tignanello FLASCHE 0,75l" },
+    { id: 519, name: "RAMAZZOTTI 4cl" },
+    { id: 520, name: "RAMAZZOTTI 2cl" }
 ];
 
 function searchMenu() {
@@ -366,18 +381,30 @@ function searchMenu() {
 
     const matches = menu.filter(item =>
         (idQuery !== '' && item.id.toString().startsWith(idQuery)) ||
-        item.name.toLowerCase().includes(query)
+        item.name.toLowerCase().startsWith(query)
     );
 
     // Sort result by ID numerically: lowest number up
     matches.sort((a, b) => a.id - b.id);
 
+    // AUTO-ADD RULE: If unique match and "obvious"
+    if (matches.length === 1) {
+        const item = matches[0];
+        // Obvious if: 
+        // 1. We typed the exact ID
+        // 2. We typed at least 3 characters of the name
+        if (idQuery === item.id.toString() || (query.length >= 3 && item.name.toLowerCase().startsWith(query))) {
+            addToOrder(item);
+            return;
+        }
+    }
+
     matches.forEach(item => {
         const orderItem = currentItems.find(i => i.id === item.id);
         const qtyLabel = orderItem ? `<span style="background:var(--primary); color:white; padding:5px 15px; border-radius:20px; font-size:1.1rem; font-weight:800;">${orderItem.quantity}x</span>` : "";
 
-        // Pad display ID to at least 2 digits
-        const displayId = item.id.toString().padStart(2, '0');
+        // Raw ID display without padding
+        const displayId = item.id;
 
         const div = document.createElement('div');
         div.className = 'result-item';
@@ -414,6 +441,12 @@ function toggleKeyboard() {
 
 function addToOrder(item) {
     if (!allOrders[currentTable]) allOrders[currentTable] = [];
+
+    // Vibrate for feedback (haptic)
+    if (navigator.vibrate) {
+        navigator.vibrate(15); // Short subtle pulse
+    }
+
     // Only stack if there is no comment
     const existingEntry = allOrders[currentTable].find(i => i.id === item.id && !i.comment);
     if (existingEntry) {
@@ -469,7 +502,7 @@ function renderOrder() {
     }
 
     items.forEach(item => {
-        const displayId = item.id.toString().padStart(2, '0');
+        const displayId = item.id;
 
         const rowContainer = document.createElement('div');
         rowContainer.className = 'order-row-container';
