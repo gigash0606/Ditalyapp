@@ -34,7 +34,9 @@ body {
     overflow: hidden;
     height: 100%;
     width: 100%;
-    position: fixed;
+    /* Use overscroll-behavior to prevent periodic bounce/pull-to-refresh 
+       without the side effects of position: fixed */
+    overscroll-behavior-y: none;
 }
 
 body {
@@ -48,9 +50,6 @@ body {
     flex-direction: column;
     height: 100dvh;
     width: 100vw;
-    position: fixed;
-    top: 0;
-    left: 0;
 }
 
 button {
@@ -108,6 +107,7 @@ header {
     width: 100%;
     padding: 20px 20px 180px;
     -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
 }
 
 /* Grid Layout: 3 columns base, doubled gaps */
