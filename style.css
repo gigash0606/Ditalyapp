@@ -50,6 +50,8 @@ body {
     flex-direction: column;
     height: 100dvh;
     width: 100vw;
+    /* Block all gestures on the background to prevent zoom */
+    touch-action: none;
 }
 
 button {
@@ -77,6 +79,8 @@ header {
     position: relative;
     z-index: 1000;
     box-shadow: var(--shadow-md);
+    /* Disable gestures on header */
+    touch-action: none;
 }
 
 .header-center {
@@ -108,6 +112,8 @@ header {
     padding: 20px 20px 180px;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    /* ONLY allow vertical panning. This is the magic fix for double-tap zoom. */
+    touch-action: pan-y;
 }
 
 /* Grid Layout: 3 columns base, doubled gaps */
