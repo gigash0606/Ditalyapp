@@ -39,7 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // This JS layer specifically catches what the browser ignores in "standalone" mode.
 
     // Focus logic: Rely on manual tapping for search focus to prevent accidental keyboard popups during scroll.
-    // document.addEventListener('click', (e) => { ... }); // Removed to honor request "tapping behind... do nothing"
+    const searchInput = document.getElementById('numSearch');
+    if (searchInput) {
+        // Prevent browser from scrolling the whole window up when keyboard shows
+        searchInput.addEventListener('focus', () => {
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+        });
+    }
 });
 
 
@@ -66,7 +73,14 @@ function generateTables() {
     // "Add Table" Card
     const addCard = document.createElement('div');
     addCard.className = 'card add-table-card';
-    addCard.innerHTML = `<div style="font-size:2rem; color:var(--accent-green); font-weight:bold;">+</div>`;
+    addCard.innerHTML = `
+        <div class="card-body">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:40px; height:40px;">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </div>
+    `;
     addCard.onclick = addTable;
     grid.appendChild(addCard);
 
@@ -77,8 +91,8 @@ function generateTables() {
         card.className = `card table-card ${hasOrder ? 'has-order' : ''}`;
 
         card.innerHTML = `
-            <div class="card-body" style="font-size: 1.8rem; font-weight: bold; color: #444;">
-                ${num}
+            <div class="card-body">
+                <span style="font-size: 2.2rem; font-weight: 800; color: #333;">${num}</span>
             </div>
         `;
         card.onclick = () => selectTable(num);
