@@ -96,6 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     const modalInput = document.getElementById('modalInput');
                     const target = (modalInput && document.body.contains(modalInput)) ? modalInput : searchInput;
                     numInput(key, target);
+                } else {
+                    // Handle special buttons that don't use 'data-key'
+                    if (btn.classList.contains('swap-btn') || btn.classList.contains('symbol-btn')) {
+                        toggleKeyboard();
+                    } else if (btn.classList.contains('shift-btn')) {
+                        toggleShift();
+                    } else if (btn.classList.contains('return-btn')) {
+                        hideKeyboard();
+                    }
                 }
             }
         };
