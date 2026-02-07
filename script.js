@@ -55,10 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput) {
         const preventRubberBand = (e) => {
             const results = document.getElementById('searchResults');
-            const isResultScroll = results && results.classList.contains('active') && results.contains(e.target);
+            const activeOrder = document.getElementById('activeOrder');
 
-            // Only allow touchmove inside the active results list
-            if (!isResultScroll && e.cancelable) {
+            const isResultScroll = results && results.classList.contains('active') && results.contains(e.target);
+            const isActiveOrderScroll = activeOrder && activeOrder.contains(e.target);
+
+            // Allow touchmove inside results list OR active order list
+            if (!isResultScroll && !isActiveOrderScroll && e.cancelable) {
                 e.preventDefault();
             }
         };
