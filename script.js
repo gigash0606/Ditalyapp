@@ -183,7 +183,7 @@ function generateTables() {
         const hasOrder = (allOrders[num] && allOrders[num].length > 0);
         const card = document.createElement('div');
         card.className = `card table-card ${hasOrder ? 'has-order' : ''}`;
-        card.onclick = () => selectTable(num);
+        card.onclick = () => selectTable(num, true);
 
         card.innerHTML = `
             <div class="card-body">
@@ -226,12 +226,12 @@ function addTable() {
         tables.push(tableNum);
         localStorage.setItem('waiterTables', JSON.stringify(tables));
         generateTables();
-        selectTable(tableNum);
+        selectTable(tableNum, true);
     });
 }
 
 
-function selectTable(num) {
+function selectTable(num, autoFocus = false) {
     currentTable = num;
     localStorage.setItem('waiterCurrentTable', num);
 
@@ -249,6 +249,15 @@ function selectTable(num) {
     updateHeaderTitle("Tisch " + num);
 
     renderOrder();
+
+    if (autoFocus) {
+        setTimeout(() => {
+            const input = document.getElementById('numSearch');
+            if (input) {
+                input.focus({ preventScroll: true });
+            }
+        }, 100);
+    }
 }
 
 function updateHeaderTitle(title) {
