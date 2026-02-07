@@ -518,7 +518,7 @@ function renderOrder() {
         rowContainer.innerHTML = `
             <div class="swipe-delete-btn" onclick="removeFromOrder(${item.uid})">Löschen</div>
             <div class="order-row" id="row-${item.uid}">
-                <div class="qty-badge-box">
+                <div class="qty-badge-box" onclick="event.stopPropagation(); updateQuantity(${item.uid}, -1)">
                     <span class="qty-badge">${item.quantity}</span>
                 </div>
                 <div class="item-main-info">

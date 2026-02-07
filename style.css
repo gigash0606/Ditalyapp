@@ -354,13 +354,14 @@ header {
 .clear-table-btn {
     background: rgba(26, 146, 130, 0.25);
     color: var(--primary);
-    border: 1px solid #eee !important;
+    border: none !important;
 }
 
 .delete-table-btn {
-    background: var(--primary);
-    color: white;
-    border: 1px solid #eee !important;
+    background: rgba(26, 146, 130, 0.25);
+    color: var(--primary);
+    border: none !important;
+    border-left: 1px solid #eee !important;
 }
 
 .footer-action-btns button:active {
