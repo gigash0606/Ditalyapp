@@ -48,6 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Otherwise (Order Screen search or no modal) -> Resize Layout
             root.style.height = window.visualViewport.height + 'px';
+
+            // CRITICAL: Force viewport scroll to 0 to prevent iOS from "panning" the view up
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
         });
     }
 
@@ -69,6 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.addEventListener('focus', () => {
             document.body.style.overflow = 'hidden'; // Ensure CSS lock
             document.addEventListener('touchmove', preventBodyScroll, { passive: false });
+
+            // Force scroll reset on focus to counter Safari auto-scroll
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.body.scrollTop = 0;
+            }, 50);
         });
 
         searchInput.addEventListener('blur', () => {
