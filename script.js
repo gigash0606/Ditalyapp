@@ -32,14 +32,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
             const root = document.getElementById('rootContainer');
-            const modalContainer = document.getElementById('modalContainer');
-            // Only resize root if no modal is open
-            // This prevents the page from shifting up during table creation (as requested)
-            const isModalOpen = modalContainer && modalContainer.children.length > 0;
+            if (!root) return;
 
-            if (root && !isModalOpen) {
-                root.style.height = window.visualViewport.height + 'px';
+            const modalContainer = document.getElementById('modalContainer');
+            const orderInterface = document.getElementById('orderInterface');
+
+            // Check specific conditions
+            const isModalOpen = modalContainer && modalContainer.children.length > 0;
+            const isOrderScreen = orderInterface && getComputedStyle(orderInterface).display !== 'none';
+
+            // IF on Home Screen AND Modal is open (Create Table) -> Don't resize (Fixed Layout)
+            if (isModalOpen && !isOrderScreen) {
+                return;
             }
+
+            // Otherwise (Order Screen search or no modal) -> Resize Layout
+            root.style.height = window.visualViewport.height + 'px';
         });
     }
 });
