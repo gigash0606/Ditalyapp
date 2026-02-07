@@ -29,18 +29,26 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
     });
 
-    // Keyboard / VisualViewport Anchor Logic (Buttery Smooth Fix)
+    // Keyboard / VisualViewport Anchor Logic (Rock Solid Fix)
     if (window.visualViewport) {
         const root = document.getElementById('rootContainer');
         const updateViewport = () => {
             const v = window.visualViewport;
 
-            // Sync the container to the visible window height and offset
-            // This ensures the header stays at the top and the footer follows the keyboard
+            // Use the visual viewport height for the container
+            // This pulls the footer up above the keyboard on all platforms
             root.style.height = `${v.height}px`;
-            root.style.transform = `translateY(${v.offsetTop}px)`;
 
-            // Clear any layout viewport scrolling to prevent "jumps"
+            // On iOS, we need to translate the root down by offsetTop
+            // to keep the header at the top of the visible area if the browser panned.
+            // On Android with interactive-widget=resizes-content, offsetTop is usually 0.
+            if (v.offsetTop > 0.5) {
+                root.style.transform = `translateY(${Math.round(v.offsetTop)}px)`;
+            } else {
+                root.style.transform = '';
+            }
+
+            // Kill any layout viewport scrolling that causes the "jump"
             if (window.scrollY !== 0) {
                 window.scrollTo(0, 0);
             }
@@ -51,6 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initial update
         updateViewport();
+
+        // Prevent layout scrolling on focus
+        document.addEventListener('focusin', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                setTimeout(() => window.scrollTo(0, 0), 0);
+            }
+        }, { passive: true });
     }
 });
 
@@ -157,7 +172,10 @@ function selectTable(num) {
     // Focus search box after a short delay
     setTimeout(() => {
         const input = document.getElementById('numSearch');
-        if (input) input.focus();
+        if (input) {
+            input.focus({ preventScroll: true });
+            window.scrollTo(0, 0);
+        }
     }, 100);
 }
 
@@ -420,7 +438,10 @@ function toggleKeyboard() {
 
     // Briefly blur and refocus to trigger the keyboard change on mobile
     input.blur();
-    setTimeout(() => input.focus(), 50);
+    setTimeout(() => {
+        input.focus({ preventScroll: true });
+        window.scrollTo(0, 0);
+    }, 50);
 }
 
 function addToOrder(item) {
@@ -672,7 +693,10 @@ function showModal(title, content, buttons, isHtml = false) {
     // Auto-focus input if present and handle 'Enter' key
     const input = modal.querySelector('input');
     if (input) {
-        setTimeout(() => input.focus(), 100);
+        setTimeout(() => {
+            input.focus({ preventScroll: true });
+            window.scrollTo(0, 0);
+        }, 100);
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 const primaryBtn = buttons.find(b => b.primary);
