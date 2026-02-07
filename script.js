@@ -50,6 +50,32 @@ document.addEventListener('DOMContentLoaded', () => {
             root.style.height = window.visualViewport.height + 'px';
         });
     }
+
+
+    // LOCK SCREEN SCROLL WHEN SEARCH IS FOCUSED
+    const searchInput = document.getElementById('numSearch');
+    if (searchInput) {
+        const preventBodyScroll = (e) => {
+            const results = document.getElementById('searchResults');
+            // If the touch target is inside the Search Results AND they are visible (active), allow scroll.
+            // Otherwise, block the touchmove to prevent screen scrolling.
+            const isResultScroll = results && results.classList.contains('active') && results.contains(e.target);
+
+            if (!isResultScroll) {
+                if (e.cancelable) e.preventDefault();
+            }
+        };
+
+        searchInput.addEventListener('focus', () => {
+            document.body.style.overflow = 'hidden'; // Ensure CSS lock
+            document.addEventListener('touchmove', preventBodyScroll, { passive: false });
+        });
+
+        searchInput.addEventListener('blur', () => {
+            document.body.style.overflow = ''; // Release CSS lock (reverts to stylesheet)
+            document.removeEventListener('touchmove', preventBodyScroll);
+        });
+    }
 });
 
 

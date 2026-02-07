@@ -459,6 +459,8 @@ header {
     overflow-y: auto;
     z-index: 2000;
     display: none !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 #searchResults.active {
