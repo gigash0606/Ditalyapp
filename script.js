@@ -32,7 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
             const root = document.getElementById('rootContainer');
-            if (root) root.style.height = window.visualViewport.height + 'px';
+            const modalContainer = document.getElementById('modalContainer');
+            // Only resize root if no modal is open
+            // This prevents the page from shifting up during table creation (as requested)
+            const isModalOpen = modalContainer && modalContainer.children.length > 0;
+
+            if (root && !isModalOpen) {
+                root.style.height = window.visualViewport.height + 'px';
+            }
         });
     }
 });
