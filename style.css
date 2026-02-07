@@ -334,8 +334,9 @@ header {
 
 /* Footer Controls - Optimized for iPhone/PWA */
 .table-footer-controls {
-    position: relative;
     background: #fff;
+    /* Clean white background for area */
+    /* Remove padding to allow buttons to sit flush */
     padding-bottom: 0;
     display: flex;
     flex-direction: column;
@@ -383,11 +384,11 @@ header {
     opacity: 0.8;
 }
 
-.bottom-search {
-    position: relative;
+.top-search {
+    position: static;
     padding: 0;
     background: #e9ecef;
-    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #eee;
     z-index: 1001;
 }
 
@@ -447,22 +448,19 @@ header {
     height: 24px;
 }
 
-/* Results Dropdown (now at bottom, opens up) */
+/* Results Dropdown (now at top) */
 #searchResults {
     position: absolute;
-    bottom: 52px;
-    top: auto;
+    top: 52px;
     left: 0;
     right: 0;
+    bottom: 0;
     background: #fdfdfd;
     overflow-y: auto;
     z-index: 2000;
     display: none !important;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-    max-height: 60vh;
-    border-top: 1px solid #ddd;
 }
 
 #searchResults.active {
@@ -507,7 +505,12 @@ header {
 }
 
 /* Responsive adjustments */
-/* Removed legacy footer padding to maintain flush bottom alignment */
+@media (max-height: 500px) {
+    .table-footer-controls {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+}
 
 /* Custom Modal Styling */
 .modal-overlay {
