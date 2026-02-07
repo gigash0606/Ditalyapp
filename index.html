@@ -17,6 +17,37 @@
 </head>
 
 <body>
+    <div id="passwordOverlay">
+        <div class="password-content">
+            <div class="pass-header">
+                <img src="https://cdn-icons-png.flaticon.com/512/1046/1046857.png" alt="Logo" class="pass-logo">
+                <h1>KellnerPad</h1>
+                <p>Bitte PIN eingeben</p>
+            </div>
+            <div id="pinDisplay" class="pin-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div id="passwordError" class="error-msg">FALSE</div>
+
+            <div class="pass-numpad">
+                <button class="pass-btn" data-val="1">1</button>
+                <button class="pass-btn" data-val="2">2</button>
+                <button class="pass-btn" data-val="3">3</button>
+                <button class="pass-btn" data-val="4">4</button>
+                <button class="pass-btn" data-val="5">5</button>
+                <button class="pass-btn" data-val="6">6</button>
+                <button class="pass-btn" data-val="7">7</button>
+                <button class="pass-btn" data-val="8">8</button>
+                <button class="pass-btn" data-val="9">9</button>
+                <button class="pass-btn empty"></button>
+                <button class="pass-btn" data-val="0">0</button>
+                <button class="pass-btn delete" data-val="back">⌫</button>
+            </div>
+        </div>
+    </div>
     <div id="rootContainer">
         <header id="headerTitle">
             <div class="header-left">

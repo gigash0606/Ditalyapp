@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    initPasswordScreen();
     generateTables();
 
     // Resume session if currentTable was set
@@ -948,4 +949,74 @@ function showLegalInfo() {
         </div>
     `;
     showModal("Information", legalText, [{ text: "Verstanden", primary: true }], true);
+}
+
+function initPasswordScreen() {
+    let enteredPin = "";
+    const correctPin = "0000";
+    const overlay = document.getElementById('passwordOverlay');
+    const dots = document.querySelectorAll('.pin-dots .dot');
+    const errorMsg = document.getElementById('passwordError');
+    const buttons = document.querySelectorAll('.pass-btn[data-val]');
+
+    function updateDots() {
+        dots.forEach((dot, index) => {
+            if (index < enteredPin.length) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
+    function checkPin() {
+        if (enteredPin === correctPin) {
+            overlay.classList.add('hidden');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 500);
+        } else {
+            // Wrong PIN
+            errorMsg.classList.add('visible');
+            enteredPin = "";
+            setTimeout(() => {
+                updateDots();
+            }, 200);
+            setTimeout(() => {
+                errorMsg.classList.remove('visible');
+            }, 1000);
+        }
+    }
+
+    buttons.forEach(btn => {
+        btn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const val = btn.getAttribute('data-val');
+
+            if (val === 'back') {
+                enteredPin = enteredPin.slice(0, -1);
+            } else if (enteredPin.length < 4) {
+                enteredPin += val;
+                if (enteredPin.length === 4) {
+                    setTimeout(checkPin, 200);
+                }
+            }
+            updateDots();
+        });
+
+        // Add mouse support for testing if needed
+        btn.addEventListener('mousedown', (e) => {
+            if (e.type === 'mousedown' && 'ontouchstart' in window) return;
+            const val = btn.getAttribute('data-val');
+            if (val === 'back') {
+                enteredPin = enteredPin.slice(0, -1);
+            } else if (enteredPin.length < 4) {
+                enteredPin += val;
+                if (enteredPin.length === 4) {
+                    setTimeout(checkPin, 200);
+                }
+            }
+            updateDots();
+        });
+    });
 }
