@@ -263,17 +263,18 @@ header {
 
 .qty-badge-box {
     width: 60px;
-    background: var(--primary);
+    background: rgba(26, 146, 130, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .qty-badge {
     font-size: 1.2rem;
     font-weight: 700;
-    color: white;
+    color: var(--primary);
 }
 
 .item-main-info {
@@ -351,13 +352,15 @@ header {
 }
 
 .clear-table-btn {
-    background: #f8f9fa;
-    color: #555;
+    background: rgba(26, 146, 130, 0.25);
+    color: var(--primary);
+    border: 1px solid #eee !important;
 }
 
 .delete-table-btn {
     background: var(--primary);
     color: white;
+    border: 1px solid #eee !important;
 }
 
 .footer-action-btns button:active {
@@ -471,8 +474,8 @@ header {
 }
 
 .result-item .qty-tag {
-    background: var(--primary);
-    color: white;
+    background: rgba(26, 146, 130, 0.25);
+    color: var(--primary);
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 0.9rem;
