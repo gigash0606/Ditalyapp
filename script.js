@@ -471,12 +471,19 @@ function showCustomKeyboard(input) {
     const customKb = document.getElementById('customKeyboard');
     const rootContainer = document.getElementById('rootContainer');
 
-    // Get keyboard height
+    // Show keyboard first (off-screen)
     customKb.style.display = 'block';
+
+    // Get keyboard height after it's rendered
     const keyboardHeight = customKb.offsetHeight;
 
     // Resize root container to accommodate keyboard (like iOS does)
     rootContainer.style.paddingBottom = keyboardHeight + 'px';
+
+    // Add visible class for slide-up animation after layout adjustment
+    setTimeout(() => {
+        customKb.classList.add('visible');
+    }, 10);
 
     // Prevent native keyboard
     input.readOnly = true;
@@ -492,8 +499,15 @@ function hideCustomKeyboard() {
     const customKb = document.getElementById('customKeyboard');
     const rootContainer = document.getElementById('rootContainer');
 
-    customKb.style.display = 'none';
-    rootContainer.style.paddingBottom = '0';
+    // Remove visible class for slide-down animation
+    customKb.classList.remove('visible');
+
+    // After animation completes, hide and reset
+    setTimeout(() => {
+        customKb.style.display = 'none';
+        rootContainer.style.paddingBottom = '0';
+    }, 300); // Match CSS transition duration
+
     activeKeyboardInput = null;
 }
 
