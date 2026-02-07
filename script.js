@@ -81,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let tables = [];
 let allOrders = {};
-let activeKeyboardInput = null; // Track which input is active for custom keyboard
 
 try {
     tables = JSON.parse(localStorage.getItem('waiterTables')) || [];
@@ -180,7 +179,13 @@ function selectTable(num) {
 
     renderOrder();
 
-    // Don't auto-show keyboard - let user click search input when ready
+    // Focus search box after a short delay
+    setTimeout(() => {
+        const input = document.getElementById('numSearch');
+        if (input) {
+            input.focus({ preventScroll: true });
+        }
+    }, 100);
 }
 
 
@@ -198,10 +203,7 @@ function backToTables() {
 
     const input = document.getElementById('numSearch');
     input.value = "";
-    input.readOnly = true; // Reset to custom keyboard mode
-    input.inputMode = "none";
     document.getElementById('searchResults').innerHTML = "";
-    hideCustomKeyboard();
     generateTables();
 }
 
@@ -436,76 +438,20 @@ function toggleKeyboard() {
     const input = document.getElementById('numSearch');
     const btn = document.getElementById('kbToggle');
 
-    // Check current inputmode to determine which keyboard is showing
     if (input.inputMode === 'decimal') {
-        // Switch to full keyboard
         input.inputMode = 'text';
         btn.style.background = 'var(--primary)';
         btn.style.color = 'white';
-
-        // Refocus to update keyboard
-        input.blur();
-        setTimeout(() => input.focus(), 50);
     } else {
-        // Switch back to numpad
         input.inputMode = 'decimal';
         btn.style.background = '#9ca3af';
         btn.style.color = 'white';
-
-        // Refocus to update keyboard
-        input.blur();
-        setTimeout(() => input.focus(), 50);
-    }
-}
-
-
-// Custom Keyboard Functions (only used for Add Table modal)
-function showCustomKeyboard(input) {
-    activeKeyboardInput = input;
-    const customKb = document.getElementById('customKeyboard');
-    const modal = input.closest('.modal');
-
-    // Show keyboard instantly
-    customKb.style.display = 'block';
-
-    // Only adjust modal positioning if inside a modal
-    if (modal) {
-        const keyboardHeight = customKb.offsetHeight;
-        modal.style.marginBottom = keyboardHeight + 'px';
     }
 
-    // Prevent native keyboard
-    input.readOnly = true;
-    input.inputMode = 'none';
-    input.focus({ preventScroll: true });
-}
-
-function hideCustomKeyboard() {
-    const customKb = document.getElementById('customKeyboard');
-
-    // Reset modal margin if it exists
-    const modal = document.querySelector('.modal');
-    if (modal) {
-        modal.style.marginBottom = '50px';
-    }
-
-    // Hide instantly
-    customKb.style.display = 'none';
-    activeKeyboardInput = null;
-}
-
-function keyboardInput(char) {
-    if (!activeKeyboardInput) return;
-
-    const currentValue = activeKeyboardInput.value || '';
-    activeKeyboardInput.value = currentValue + char;
-}
-
-function keyboardDelete() {
-    if (!activeKeyboardInput) return;
-
-    const currentValue = activeKeyboardInput.value || '';
-    activeKeyboardInput.value = currentValue.slice(0, -1);
+    input.blur();
+    setTimeout(() => {
+        input.focus({ preventScroll: true });
+    }, 50);
 }
 
 
@@ -693,31 +639,17 @@ function customPrompt(title, message, callback) {
     const inputId = "modalInput";
     const bodyContent = `
         <p style="margin-bottom:15px;">${message}</p>
-        <input type="text" id="${inputId}" class="modal-input" style="text-align:center;" inputmode="none" readonly autofocus>
+        <input type="number" id="${inputId}" class="modal-input" style="text-align:center;" inputmode="numeric" autofocus>
     `;
     showModal(title, bodyContent, [
-        {
-            text: "✖", primary: false, onClick: () => {
-                hideCustomKeyboard();
-                callback(null);
-            }
-        },
+        { text: "✖", primary: false, onClick: () => callback(null) },
         {
             text: "✔", primary: true, onClick: () => {
                 const val = document.getElementById(inputId).value;
-                hideCustomKeyboard();
                 callback(val);
             }
         }
-    ], true, () => {
-        // onShow callback - show custom keyboard after modal renders
-        requestAnimationFrame(() => {
-            const input = document.getElementById(inputId);
-            if (input) {
-                showCustomKeyboard(input);
-            }
-        });
-    });
+    ], true);
 }
 
 function customTextPrompt(title, message, callback) {
@@ -740,7 +672,7 @@ function customTextPrompt(title, message, callback) {
     ], true);
 }
 
-function showModal(title, content, buttons, isHtml = false, onShow = null) {
+function showModal(title, content, buttons, isHtml = false) {
     const container = document.getElementById('modalContainer');
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -774,7 +706,9 @@ function showModal(title, content, buttons, isHtml = false, onShow = null) {
     // Auto-focus input if present and handle 'Enter' key
     const input = modal.querySelector('input');
     if (input) {
-        input.focus({ preventScroll: true });
+        setTimeout(() => {
+            input.focus({ preventScroll: true });
+        }, 100);
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 const primaryBtn = buttons.find(b => b.primary);
@@ -784,11 +718,6 @@ function showModal(title, content, buttons, isHtml = false, onShow = null) {
                 }
             }
         });
-    }
-
-    // Call onShow callback instantly if provided
-    if (onShow) {
-        onShow();
     }
 }
 
