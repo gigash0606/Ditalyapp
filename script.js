@@ -35,10 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const updateViewport = () => {
             const v = window.visualViewport;
 
-            // 1. Sync the container to the visible window height
+            // Sync the container to the visible window height and offset
+            // This ensures the header stays at the top and the footer follows the keyboard
             root.style.height = `${v.height}px`;
+            root.style.transform = `translateY(${v.offsetTop}px)`;
 
-            // 2. Clear any scrolling on the body/html to keep fixed elements stable
+            // Clear any layout viewport scrolling to prevent "jumps"
             if (window.scrollY !== 0) {
                 window.scrollTo(0, 0);
             }
@@ -47,25 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.visualViewport.addEventListener('resize', updateViewport);
         window.visualViewport.addEventListener('scroll', updateViewport);
 
-        // Block manual window scrolling entirely
-        window.addEventListener('scroll', (e) => {
-            if (window.scrollY !== 0) {
-                window.scrollTo(0, 0);
-            }
-        }, { passive: false });
-
+        // Initial update
         updateViewport();
-    }
-
-    const searchInput = document.getElementById('numSearch');
-    if (searchInput) {
-        searchInput.addEventListener('focus', () => {
-            // Block any initial scroll jumps when keyboard pops up
-            setTimeout(() => {
-                window.scrollTo(0, 0);
-                document.body.scrollTop = 0;
-            }, 10);
-        });
     }
 });
 

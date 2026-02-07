@@ -51,8 +51,7 @@ body {
     flex-direction: column;
     overflow: hidden;
     background: var(--bg);
-    will-change: top, height;
-    /* Hardware acceleration for viewport changes */
+    will-change: transform, height;
 }
 
 header {
@@ -65,8 +64,7 @@ header {
     justify-content: space-between;
     padding-left: 20px;
     padding-right: 20px;
-    position: absolute;
-    /* Changed from fixed to absolute */
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
