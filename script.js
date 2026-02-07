@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let tables = [];
 let allOrders = {};
+let activeKeyboardInput = null; // Track which input is active for custom keyboard
 
 try {
     tables = JSON.parse(localStorage.getItem('waiterTables')) || [];
@@ -179,13 +180,7 @@ function selectTable(num) {
 
     renderOrder();
 
-    // Focus search box after a short delay
-    setTimeout(() => {
-        const input = document.getElementById('numSearch');
-        if (input) {
-            input.focus({ preventScroll: true });
-        }
-    }, 100);
+    // Don't auto-show keyboard - let user click search input when ready
 }
 
 
@@ -203,7 +198,10 @@ function backToTables() {
 
     const input = document.getElementById('numSearch');
     input.value = "";
+    input.readOnly = true; // Reset to custom keyboard mode
+    input.inputMode = "none";
     document.getElementById('searchResults').innerHTML = "";
+    hideCustomKeyboard();
     generateTables();
 }
 
@@ -437,21 +435,90 @@ function searchMenu() {
 function toggleKeyboard() {
     const input = document.getElementById('numSearch');
     const btn = document.getElementById('kbToggle');
+    const customKb = document.getElementById('customKeyboard');
 
-    if (input.inputMode === 'decimal') {
+    // Check if currently in custom keyboard mode (readonly)
+    if (input.readOnly) {
+        // Switch to native keyboard mode
+        input.readOnly = false;
         input.inputMode = 'text';
         btn.style.background = 'var(--primary)';
         btn.style.color = 'white';
+        customKb.style.display = 'none';
+        activeKeyboardInput = null;
+
+        input.blur();
+        setTimeout(() => {
+            input.focus({ preventScroll: true });
+        }, 50);
     } else {
-        input.inputMode = 'decimal';
+        // Switch back to custom keyboard mode
+        input.readOnly = true;
+        input.inputMode = 'none';
         btn.style.background = '#9ca3af';
         btn.style.color = 'white';
-    }
 
-    input.blur();
+        input.blur();
+        setTimeout(() => {
+            showCustomKeyboard(input);
+        }, 50);
+    }
+}
+
+// Custom Keyboard Functions
+function showCustomKeyboard(input) {
+    activeKeyboardInput = input;
+    const customKb = document.getElementById('customKeyboard');
+    const rootContainer = document.getElementById('rootContainer');
+
+    // Get keyboard height
+    customKb.style.display = 'block';
+    const keyboardHeight = customKb.offsetHeight;
+
+    // Resize root container to accommodate keyboard (like iOS does)
+    rootContainer.style.paddingBottom = keyboardHeight + 'px';
+
+    // Prevent native keyboard
+    input.readOnly = true;
+    input.inputMode = 'none';
+
+    // Focus the input (but it won't show native keyboard due to readonly)
     setTimeout(() => {
         input.focus({ preventScroll: true });
-    }, 50);
+    }, 100);
+}
+
+function hideCustomKeyboard() {
+    const customKb = document.getElementById('customKeyboard');
+    const rootContainer = document.getElementById('rootContainer');
+
+    customKb.style.display = 'none';
+    rootContainer.style.paddingBottom = '0';
+    activeKeyboardInput = null;
+}
+
+function keyboardInput(char) {
+    if (!activeKeyboardInput) return;
+
+    const currentValue = activeKeyboardInput.value || '';
+    activeKeyboardInput.value = currentValue + char;
+
+    // Trigger input event for search functionality
+    if (activeKeyboardInput.id === 'numSearch') {
+        searchMenu();
+    }
+}
+
+function keyboardDelete() {
+    if (!activeKeyboardInput) return;
+
+    const currentValue = activeKeyboardInput.value || '';
+    activeKeyboardInput.value = currentValue.slice(0, -1);
+
+    // Trigger input event for search functionality
+    if (activeKeyboardInput.id === 'numSearch') {
+        searchMenu();
+    }
 }
 
 
@@ -639,17 +706,29 @@ function customPrompt(title, message, callback) {
     const inputId = "modalInput";
     const bodyContent = `
         <p style="margin-bottom:15px;">${message}</p>
-        <input type="number" id="${inputId}" class="modal-input" style="text-align:center;" inputmode="numeric" autofocus>
+        <input type="text" id="${inputId}" class="modal-input" style="text-align:center;" inputmode="none" readonly autofocus>
     `;
     showModal(title, bodyContent, [
-        { text: "✖", primary: false, onClick: () => callback(null) },
+        {
+            text: "✖", primary: false, onClick: () => {
+                hideCustomKeyboard();
+                callback(null);
+            }
+        },
         {
             text: "✔", primary: true, onClick: () => {
                 const val = document.getElementById(inputId).value;
+                hideCustomKeyboard();
                 callback(val);
             }
         }
-    ], true);
+    ], true, () => {
+        // onShow callback - show custom keyboard for this input
+        const input = document.getElementById(inputId);
+        if (input) {
+            showCustomKeyboard(input);
+        }
+    });
 }
 
 function customTextPrompt(title, message, callback) {
@@ -672,7 +751,7 @@ function customTextPrompt(title, message, callback) {
     ], true);
 }
 
-function showModal(title, content, buttons, isHtml = false) {
+function showModal(title, content, buttons, isHtml = false, onShow = null) {
     const container = document.getElementById('modalContainer');
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -718,6 +797,11 @@ function showModal(title, content, buttons, isHtml = false) {
                 }
             }
         });
+    }
+
+    // Call onShow callback if provided
+    if (onShow) {
+        setTimeout(() => onShow(), 150);
     }
 }
 
