@@ -178,12 +178,6 @@ function selectTable(num) {
     document.getElementById('headerTitle').querySelector('.header-center').innerText = "Tisch " + num;
 
     renderOrder();
-
-    // Focus search box immediately
-    const input = document.getElementById('numSearch');
-    if (input) {
-        input.focus({ preventScroll: true });
-    }
 }
 
 
@@ -630,7 +624,7 @@ function customPrompt(title, message, callback) {
     const inputId = "modalInput";
     const bodyContent = `
         <p style="margin-bottom:15px;">${message}</p>
-        <input type="text" id="${inputId}" class="modal-input" style="text-align:center;" inputmode="decimal" pattern="[0-9]*" autofocus autocomplete="off">
+        <input type="text" id="${inputId}" class="modal-input" style="text-align:center;" inputmode="decimal" pattern="[0-9]*" autocomplete="off">
     `;
     showModal(title, bodyContent, [
         { text: "✖", primary: false, onClick: () => callback(null) },
@@ -647,7 +641,7 @@ function customTextPrompt(title, message, callback) {
     const inputId = "modalInput";
     const bodyContent = `
         <p style="margin-bottom:15px;">${message}</p>
-        <input type="text" id="${inputId}" class="modal-input" style="text-align:center;" autofocus autocomplete="off">
+        <input type="text" id="${inputId}" class="modal-input" style="text-align:center;" autocomplete="off">
     `;
     showModal(title, bodyContent, [
         { text: "✖", primary: false, onClick: () => callback(null) },
@@ -686,6 +680,8 @@ function showModal(title, content, buttons, isHtml = false) {
         b.innerText = btn.text;
         b.onclick = () => {
             if (btn.onClick) btn.onClick();
+            // Force keyboard dismissal
+            if (document.activeElement) document.activeElement.blur();
             container.removeChild(overlay);
         };
         footer.appendChild(b);
@@ -694,18 +690,15 @@ function showModal(title, content, buttons, isHtml = false) {
     overlay.appendChild(modal);
     container.appendChild(overlay);
 
-    // Auto-focus input if present and handle 'Enter' key
+    // Handle 'Enter' key
     const input = modal.querySelector('input');
     if (input) {
-        input.focus({ preventScroll: true });
-        input.select();
-        // For iOS to definitely show keyboard, a click can help
-        input.click();
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 const primaryBtn = buttons.find(b => b.primary);
                 if (primaryBtn && primaryBtn.onClick) {
                     primaryBtn.onClick();
+                    if (document.activeElement) document.activeElement.blur();
                     container.removeChild(overlay);
                 }
             }
