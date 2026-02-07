@@ -111,10 +111,11 @@ function generateTables() {
     grid.appendChild(addCard);
 
     // Existing Tables
-    tables.sort((a, b) => a - b).forEach(num => {
+    tables.sort((a, b) => a - b).forEach((num, index) => {
         const hasOrder = (allOrders[num] && allOrders[num].length > 0);
         const card = document.createElement('div');
         card.className = `card table-card ${hasOrder ? 'has-order' : ''}`;
+        card.style.animationDelay = `${index * 0.03}s`;
         card.onclick = () => selectTable(num);
 
         card.innerHTML = `
@@ -125,6 +126,7 @@ function generateTables() {
         grid.appendChild(card);
     });
 }
+
 function removeTable(num) {
     customConfirm("Tisch löschen", `Tisch ${num} löschen?`, (confirmed) => {
         if (confirmed) {
@@ -165,37 +167,59 @@ function addTable() {
 function selectTable(num) {
     currentTable = num;
     localStorage.setItem('waiterCurrentTable', num);
-    document.getElementById('tableGridContainer').style.display = 'none';
+
+    const gridContainer = document.getElementById('tableGridContainer');
     const orderIface = document.getElementById('orderInterface');
+
+    gridContainer.style.display = 'none';
     orderIface.style.display = 'flex';
+    orderIface.classList.add('active');
 
     // Update Header
     document.getElementById('backToTablesBtn').style.display = 'flex';
     document.getElementById('deleteAllBtn').style.display = 'none';
     document.getElementById('infoBtn').style.display = 'none';
-    document.getElementById('headerTitle').querySelector('.header-center').innerText = "Tisch " + num;
+    updateHeaderTitle("Tisch " + num);
 
     renderOrder();
 }
+
+function updateHeaderTitle(title) {
+    const el = document.getElementById('headerTitle').querySelector('.header-center');
+    el.classList.add('changing');
+    setTimeout(() => {
+        el.innerText = title;
+        el.classList.remove('changing');
+    }, 150);
+}
+
+
 
 
 function backToTables() {
     currentTable = null;
     localStorage.removeItem('waiterCurrentTable');
-    document.getElementById('tableGridContainer').style.display = 'block';
-    document.getElementById('orderInterface').style.display = 'none';
+
+    const gridContainer = document.getElementById('tableGridContainer');
+    const orderIface = document.getElementById('orderInterface');
+
+    gridContainer.style.display = 'flex'; // Ensure flex for consistency
+    orderIface.style.display = 'none';
+    orderIface.classList.remove('active');
 
     // Update Header
     document.getElementById('backToTablesBtn').style.display = 'none';
     document.getElementById('deleteAllBtn').style.display = 'flex';
     document.getElementById('infoBtn').style.display = 'flex';
-    document.getElementById('headerTitle').querySelector('.header-center').innerText = "Tische";
+    updateHeaderTitle("Tische");
+
 
     const input = document.getElementById('numSearch');
     input.value = "";
     document.getElementById('searchResults').innerHTML = "";
     generateTables();
 }
+
 
 
 // ... Menu and Order logic remains similar but optimized ...
@@ -451,33 +475,45 @@ function addToOrder(item) {
 
 
 
-    // Only stack if there is no comment
     const existingEntry = allOrders[currentTable].find(i => i.id === item.id && !i.comment);
+    let targetUid = null;
     if (existingEntry) {
         existingEntry.quantity = (existingEntry.quantity || 1) + 1;
+        targetUid = existingEntry.uid;
     } else {
+        targetUid = Date.now() + Math.random();
         allOrders[currentTable].push({
             ...item,
             quantity: 1,
             comment: "",
-            uid: Date.now() + Math.random()
+            uid: targetUid
         });
     }
-    saveAndRender();
+    saveAndRender(targetUid, existingEntry ? 'update' : 'new');
+
+
+
     const searchInput = document.getElementById('numSearch');
+
     searchInput.value = "";
     document.getElementById('searchResults').innerHTML = "";
     document.getElementById('searchResults').classList.remove('active');
 
-    // Auto-scroll to bottom of order list immediately
-    const list = document.getElementById('activeOrder');
-    if (list) {
-        list.scrollTop = list.scrollHeight;
-    }
+    // Auto-scroll to bottom of order list to see the new item adding
+    setTimeout(() => {
+        const list = document.getElementById('activeOrder');
+        if (list) {
+            list.scrollTo({
+                top: list.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    }, 50);
 
     // Keep keyboard open
     searchInput.focus();
 }
+
 
 function updateQuantity(uid, delta) {
     const item = allOrders[currentTable].find(i => i.uid === uid);
@@ -486,23 +522,47 @@ function updateQuantity(uid, delta) {
     if (item.quantity <= 0) {
         allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
     }
-    saveAndRender();
+    saveAndRender(uid, 'update');
+
+
 
     // Keep keyboard open
     document.getElementById('numSearch').focus();
 }
 
 function removeFromOrder(uid) {
-    allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
-    saveAndRender();
+    const row = document.getElementById(`row-${uid}`);
+    if (row && row.parentElement) {
+        row.parentElement.style.animation = `slideUp var(--transition-normal) reverse forwards`;
+        setTimeout(() => {
+            allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
+            saveAndRender();
+        }, 200);
+    } else {
+        allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
+        saveAndRender();
+    }
 }
 
-function saveAndRender() {
+
+function saveAndRender(targetUid = null, type = null) {
     localStorage.setItem('waiterData', JSON.stringify(allOrders));
-    renderOrder();
+    renderOrder(targetUid, type);
+    if (targetUid && type === 'update') {
+        const row = document.getElementById(`row-${targetUid}`);
+        if (row) {
+            const badge = row.querySelector('.qty-badge');
+            if (badge) {
+                badge.classList.add('pulse');
+                setTimeout(() => badge.classList.remove('pulse'), 300);
+            }
+        }
+    }
 }
 
-function renderOrder() {
+
+
+function renderOrder(highlightUid = null, type = null) {
     const container = document.getElementById('activeOrder');
     container.innerHTML = "";
     const items = allOrders[currentTable] || [];
@@ -517,6 +577,10 @@ function renderOrder() {
 
         const rowContainer = document.createElement('div');
         rowContainer.className = 'order-row-container';
+        if (item.uid === highlightUid) {
+            if (type === 'new') rowContainer.classList.add('item-new');
+            if (type === 'update') rowContainer.classList.add('item-updated');
+        }
 
         rowContainer.innerHTML = `
             <div class="swipe-delete-btn" onclick="removeFromOrder(${item.uid})">Löschen</div>
@@ -532,6 +596,7 @@ function renderOrder() {
         `;
 
         const row = rowContainer.querySelector('.order-row');
+
 
         // Single Tap to Increment
         row.onclick = (e) => {
@@ -553,9 +618,11 @@ function renderOrder() {
             const touchEndX = e.changedTouches[0].clientX;
             const diff = touchStartX - touchEndX;
 
-            if (diff > 50) { // Swipe left
+            if (diff > 40) { // Swipe left
+                row.style.transform = 'translateX(-80px)';
                 row.classList.add('swiped');
-            } else if (diff < -50) { // Swipe right
+            } else if (diff < -40) { // Swipe right
+                row.style.transform = 'translateX(0)';
                 row.classList.remove('swiped');
             }
         };
@@ -563,6 +630,8 @@ function renderOrder() {
         container.appendChild(rowContainer);
     });
 }
+
+
 
 function editComment(uid) {
     const item = allOrders[currentTable].find(i => i.uid === uid);
