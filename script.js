@@ -1,6 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     generateTables();
 
+    // Set search input to use custom numpad by default
+    const numSearchInput = document.getElementById('numSearch');
+    if (numSearchInput) {
+        numSearchInput.readOnly = true;
+        numSearchInput.inputMode = 'none';
+
+        // Show custom keyboard when clicking input
+        numSearchInput.addEventListener('click', () => {
+            if (numSearchInput.readOnly) {
+                showCustomKeyboard(numSearchInput);
+            }
+        });
+    }
+
     // Resume session if currentTable was set
     const savedTable = localStorage.getItem('waiterCurrentTable');
     if (savedTable) {
@@ -435,21 +449,22 @@ function searchMenu() {
 function toggleKeyboard() {
     const input = document.getElementById('numSearch');
     const btn = document.getElementById('kbToggle');
+    const customKb = document.getElementById('customKeyboard');
 
-    // Check if currently in custom keyboard mode (readonly)
+    // Check if currently using custom numpad (readonly mode)
     if (input.readOnly) {
-        // Switch to native keyboard mode - instant
+        // Switch to native full keyboard
         hideCustomKeyboard();
 
         input.readOnly = false;
-        input.inputMode = 'text';
+        input.inputMode = 'text';  // Full keyboard, not numpad
         btn.style.background = 'var(--primary)';
         btn.style.color = 'white';
 
-        input.blur();
-        input.focus({ preventScroll: true });
+        // Focus to trigger native keyboard
+        input.focus();
     } else {
-        // Switch back to custom keyboard mode - instant
+        // Switch back to custom numpad
         input.readOnly = true;
         input.inputMode = 'none';
         btn.style.background = '#9ca3af';
@@ -459,6 +474,24 @@ function toggleKeyboard() {
         showCustomKeyboard(input);
     }
 }
+
+// Click away to hide keyboard
+document.addEventListener('click', (e) => {
+    const customKb = document.getElementById('customKeyboard');
+    const input = document.getElementById('numSearch');
+    const toggleBtn = document.getElementById('kbToggle');
+
+    // Only hide if keyboard is visible and click is outside
+    if (customKb && customKb.style.display === 'block') {
+        if (!customKb.contains(e.target) &&
+            e.target !== input &&
+            e.target !== toggleBtn &&
+            !toggleBtn.contains(e.target)) {
+            hideCustomKeyboard();
+            input.blur();
+        }
+    }
+});
 
 // Custom Keyboard Functions
 function showCustomKeyboard(input) {
@@ -489,15 +522,21 @@ function hideCustomKeyboard() {
     activeKeyboardInput = null;
 }
 
+let searchUpdatePending = false;
+
 function keyboardInput(char) {
     if (!activeKeyboardInput) return;
 
     const currentValue = activeKeyboardInput.value || '';
     activeKeyboardInput.value = currentValue + char;
 
-    // Trigger input event for search functionality
-    if (activeKeyboardInput.id === 'numSearch') {
-        searchMenu();
+    // Batch search updates for better performance
+    if (activeKeyboardInput.id === 'numSearch' && !searchUpdatePending) {
+        searchUpdatePending = true;
+        requestAnimationFrame(() => {
+            searchMenu();
+            searchUpdatePending = false;
+        });
     }
 }
 
@@ -507,9 +546,13 @@ function keyboardDelete() {
     const currentValue = activeKeyboardInput.value || '';
     activeKeyboardInput.value = currentValue.slice(0, -1);
 
-    // Trigger input event for search functionality
-    if (activeKeyboardInput.id === 'numSearch') {
-        searchMenu();
+    // Batch search updates for better performance
+    if (activeKeyboardInput.id === 'numSearch' && !searchUpdatePending) {
+        searchUpdatePending = true;
+        requestAnimationFrame(() => {
+            searchMenu();
+            searchUpdatePending = false;
+        });
     }
 }
 
