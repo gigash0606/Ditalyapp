@@ -29,39 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
     });
 
-    // Keyboard / VisualViewport Anchor Logic (Ultimate Smooth Fix)
-    if (window.visualViewport) {
-        const root = document.getElementById('rootContainer');
-        const updateViewport = () => {
-            const v = window.visualViewport;
-
-            // Update height to bring footer up. 
-            // We NO LONGER use translateY because that's what causes the "sliding" jump.
-            root.style.height = `${v.height}px`;
-
-            // Forcing scroll to 0 prevents the browser from trying to "pan" 
-            // which usually shifts fixed elements like the header.
-            if (window.scrollY !== 0) {
-                window.scrollTo(0, 0);
-            }
-        };
-
-        window.visualViewport.addEventListener('resize', updateViewport);
-        window.visualViewport.addEventListener('scroll', updateViewport);
-
-        // Initial update
-        updateViewport();
-
-        // Prevent layout scrolling on focus
-        document.addEventListener('focusin', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                window.scrollTo(0, 0);
-                // Also trigger a layout update
-                updateViewport();
-            }
-        }, { passive: true });
-    }
 });
+
 
 let tables = [];
 let allOrders = {};
@@ -168,10 +137,10 @@ function selectTable(num) {
         const input = document.getElementById('numSearch');
         if (input) {
             input.focus({ preventScroll: true });
-            // Let the visualViewport handler deal with the scroll
         }
     }, 100);
 }
+
 
 function backToTables() {
     currentTable = null;
@@ -430,12 +399,12 @@ function toggleKeyboard() {
         btn.style.color = 'white';
     }
 
-    // Briefly blur and refocus to trigger the keyboard change on mobile
     input.blur();
     setTimeout(() => {
         input.focus({ preventScroll: true });
     }, 50);
 }
+
 
 function addToOrder(item) {
     if (!allOrders[currentTable]) allOrders[currentTable] = [];
