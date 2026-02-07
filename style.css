@@ -334,9 +334,8 @@ header {
 
 /* Footer Controls - Optimized for iPhone/PWA */
 .table-footer-controls {
+    position: relative;
     background: #fff;
-    /* Clean white background for area */
-    /* Remove padding to allow buttons to sit flush */
     padding-bottom: 0;
     display: flex;
     flex-direction: column;
@@ -384,11 +383,11 @@ header {
     opacity: 0.8;
 }
 
-.top-search {
-    position: static;
+.bottom-search {
+    position: relative;
     padding: 0;
     background: #e9ecef;
-    border-bottom: 1px solid #eee;
+    border-top: 1px solid #ddd;
     z-index: 1001;
 }
 
@@ -448,19 +447,20 @@ header {
     height: 24px;
 }
 
-/* Results Dropdown (now at top) */
+/* Results Dropdown (now at bottom, opens up) */
 #searchResults {
     position: absolute;
-    top: 52px;
+    bottom: 52px;
+    top: auto;
     left: 0;
     right: 0;
-    bottom: 0;
     background: #fdfdfd;
     overflow-y: auto;
     z-index: 2000;
     display: none !important;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
 }
 
 #searchResults.active {
