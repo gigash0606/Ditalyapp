@@ -428,17 +428,20 @@ function toggleKeyboard() {
     const input = document.getElementById('numSearch');
     const btn = document.getElementById('kbToggle');
 
-    if (input.inputMode === 'decimal') {
-        input.inputMode = 'text';
-        btn.style.background = 'var(--primary)';
-        btn.style.color = 'white';
-    } else {
-        input.inputMode = 'decimal';
-        btn.style.background = '#9ca3af';
-        btn.style.color = 'white';
+    // If already focused, clicking the keyboard icon should hide/blur
+    if (document.activeElement === input) {
+        input.blur();
+        return;
     }
 
-    input.blur();
+    if (input.inputMode === 'decimal') {
+        input.inputMode = 'text';
+        btn.classList.add('active-mode');
+    } else {
+        input.inputMode = 'decimal';
+        btn.classList.remove('active-mode');
+    }
+
     input.focus({ preventScroll: true });
 }
 

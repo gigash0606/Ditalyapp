@@ -415,9 +415,9 @@ header {
 }
 
 .kb-switch-btn {
-    width: 52px;
+    width: 60px;
     height: 52px;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.04);
     border: none;
     border-radius: 0;
     color: #7f8c8d;
@@ -425,11 +425,31 @@ header {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.kb-switch-btn.active-mode {
+    background: var(--primary);
+    color: white;
+}
+
+.kb-switch-btn:active {
+    background: rgba(26, 146, 130, 0.1);
+}
+
+.kb-switch-btn.active-mode:active {
+    background: var(--primary);
+    opacity: 0.8;
 }
 
 .kb-switch-btn svg {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
+    transition: transform 0.2s ease;
+}
+
+.kb-switch-btn:active svg {
+    transform: scale(0.9);
 }
 
 /* Results Dropdown (now at top) */
