@@ -631,8 +631,7 @@ header {
     left: 0;
     right: 0;
     background: #d3d3d8;
-    padding: 8px 4px;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    padding: 6px 4px 4px 4px;
     box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1);
     z-index: 5000;
     border-top: 1px solid #a5a5aa;

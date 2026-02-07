@@ -463,14 +463,16 @@ function toggleKeyboard() {
 function showCustomKeyboard(input) {
     activeKeyboardInput = input;
     const customKb = document.getElementById('customKeyboard');
-    const rootContainer = document.getElementById('rootContainer');
+    const modal = input.closest('.modal');
 
     // Show keyboard instantly
     customKb.style.display = 'block';
-    const keyboardHeight = customKb.offsetHeight;
 
-    // Resize root container instantly
-    rootContainer.style.paddingBottom = keyboardHeight + 'px';
+    // Only adjust modal positioning if inside a modal
+    if (modal) {
+        const keyboardHeight = customKb.offsetHeight;
+        modal.style.marginBottom = keyboardHeight + 'px';
+    }
 
     // Prevent native keyboard
     input.readOnly = true;
@@ -480,11 +482,15 @@ function showCustomKeyboard(input) {
 
 function hideCustomKeyboard() {
     const customKb = document.getElementById('customKeyboard');
-    const rootContainer = document.getElementById('rootContainer');
+
+    // Reset modal margin if it exists
+    const modal = document.querySelector('.modal');
+    if (modal) {
+        modal.style.marginBottom = '50px';
+    }
 
     // Hide instantly
     customKb.style.display = 'none';
-    rootContainer.style.paddingBottom = '0';
     activeKeyboardInput = null;
 }
 
