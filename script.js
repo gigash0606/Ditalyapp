@@ -41,12 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isModalOpen = modalContainer && modalContainer.children.length > 0;
             const isOrderScreen = orderInterface && getComputedStyle(orderInterface).display !== 'none';
 
-            // IF on Home Screen AND Modal is open (Create Table) -> Don't resize (Fixed Layout)
-            if (isModalOpen && !isOrderScreen) {
-                return;
-            }
-
-            // Otherwise (Order Screen search or no modal) -> Resize Layout
+            // IF on Home Screen AND Modal is open (Create Table) -> Resize to keep centered
             root.style.height = window.visualViewport.height + 'px';
         });
     }
@@ -179,13 +174,14 @@ function selectTable(num) {
 
     renderOrder();
 
-    // Focus search box after a short delay
+    // Focus and select search box after a short delay
     setTimeout(() => {
         const input = document.getElementById('numSearch');
         if (input) {
             input.focus({ preventScroll: true });
+            setTimeout(() => input.select(), 50);
         }
-    }, 100);
+    }, 150);
 }
 
 
@@ -451,7 +447,8 @@ function toggleKeyboard() {
     input.blur();
     setTimeout(() => {
         input.focus({ preventScroll: true });
-    }, 50);
+        setTimeout(() => input.select(), 50);
+    }, 150);
 }
 
 
@@ -639,7 +636,7 @@ function customPrompt(title, message, callback) {
     const inputId = "modalInput";
     const bodyContent = `
         <p style="margin-bottom:15px;">${message}</p>
-        <input type="number" id="${inputId}" class="modal-input" style="text-align:center;" inputmode="numeric" autofocus>
+        <input type="number" id="${inputId}" class="modal-input" style="text-align:center;" inputmode="decimal" autofocus>
     `;
     showModal(title, bodyContent, [
         { text: "✖", primary: false, onClick: () => callback(null) },
@@ -703,12 +700,30 @@ function showModal(title, content, buttons, isHtml = false) {
     overlay.appendChild(modal);
     container.appendChild(overlay);
 
-    // Auto-focus input if present and handle 'Enter' key
+    // Auto-focus and select input if present and handle 'Enter' key
     const input = modal.querySelector('input');
     if (input) {
+        const preventBodyScroll = (e) => {
+            if (e.cancelable) e.preventDefault();
+        };
+
+        input.addEventListener('focus', () => {
+            document.body.style.overflow = 'hidden';
+            document.addEventListener('touchmove', preventBodyScroll, { passive: false });
+            setTimeout(() => {
+                input.select();
+            }, 50);
+        });
+
+        input.addEventListener('blur', () => {
+            document.body.style.overflow = '';
+            document.removeEventListener('touchmove', preventBodyScroll);
+        });
+
         setTimeout(() => {
             input.focus({ preventScroll: true });
-        }, 100);
+        }, 150);
+
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 const primaryBtn = buttons.find(b => b.primary);
