@@ -758,11 +758,13 @@ function customPrompt(title, message, callback) {
             }
         }
     ], true, () => {
-        // onShow callback - show custom keyboard instantly
-        const input = document.getElementById(inputId);
-        if (input) {
-            showCustomKeyboard(input);
-        }
+        // onShow callback - show custom keyboard after modal renders
+        requestAnimationFrame(() => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                showCustomKeyboard(input);
+            }
+        });
     });
 }
 
