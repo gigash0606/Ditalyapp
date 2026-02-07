@@ -33,29 +33,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleViewport = () => {
         const root = document.getElementById('rootContainer');
         if (root && window.visualViewport) {
-            const height = window.visualViewport.height;
             const viewport = window.visualViewport;
+            const height = viewport.height;
 
             // Set height and update CSS variable
             root.style.height = `${height}px`;
             document.documentElement.style.setProperty('--v-height', `${height}px`);
 
-            // Offset the rootContainer by the visual viewport's offset to keep it in view
-            // This counteract's the browser's attempt to pan the page
+            // Immediately force the container to the top of the visible area
             root.style.top = `${viewport.offsetTop}px`;
 
-            // Still force scroll to 0 to be safe
-            if (viewport.offsetTop !== 0 || window.scrollY !== 0) {
+            // Aggressive scroll reset to prevent the browser from centering the input
+            if (window.scrollY !== 0) {
                 window.scrollTo(0, 0);
             }
         }
     };
 
     if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', handleViewport);
-        window.visualViewport.addEventListener('scroll', handleViewport);
-        // Also run on focus/blur to ensure sync
-        document.addEventListener('focusin', () => setTimeout(handleViewport, 50));
+        window.visualViewport.onresize = handleViewport;
+        window.visualViewport.onscroll = handleViewport;
+        // Faster response to focus events
+        document.addEventListener('focusin', () => {
+            // Tiny delay allows viewport to start updating
+            requestAnimationFrame(handleViewport);
+            setTimeout(handleViewport, 50);
+        });
     }
     handleViewport();
 
