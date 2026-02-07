@@ -845,59 +845,63 @@ header {
     left: 0;
     width: 100%;
     height: 100dvh;
-    background: var(--primary-gradient);
+    background: var(--primary);
+    /* Matched to theme/nav color */
     z-index: 10000;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     color: white;
-    padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .password-content {
     width: 100%;
-    max-width: 320px;
+    max-width: 260px;
+    /* More compact */
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 30px;
+    gap: 15px;
 }
 
 .pass-header {
     text-align: center;
+    margin-bottom: 5px;
 }
 
 .pass-logo {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 20px;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
     filter: brightness(0) invert(1);
     animation: fadeInDown 0.8s ease-out;
 }
 
 .pass-header h1 {
     margin: 0;
-    font-size: 2.2rem;
+    font-size: 1.6rem;
     font-weight: 800;
 }
 
 .pass-header p {
-    margin: 5px 0 0;
-    opacity: 0.8;
-    font-size: 1.1rem;
+    margin: 2px 0 0;
+    opacity: 0.7;
+    font-size: 0.9rem;
 }
 
 .pin-dots {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     margin: 10px 0;
 }
 
 .dot {
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -905,19 +909,21 @@ header {
 .dot.active {
     background: white;
     border-color: white;
-    transform: scale(1.2);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
 
 .error-msg {
     color: #ff4757;
     background: rgba(255, 255, 255, 0.1);
-    padding: 5px 15px;
+    padding: 3px 10px;
     border-radius: 20px;
+    font-size: 0.8rem;
     font-weight: 800;
     letter-spacing: 1px;
     opacity: 0;
     transition: opacity 0.3s;
+    height: 22px;
 }
 
 .error-msg.visible {
@@ -929,28 +935,29 @@ header {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     width: 100%;
-    gap: 15px;
+    gap: 12px;
+    margin-top: 10px;
 }
 
 .pass-btn {
     aspect-ratio: 1;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
     border-radius: 50%;
     color: white;
-    font-size: 1.8rem;
-    font-weight: 600;
+    font-size: 1.4rem;
+    font-weight: 500;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     backdrop-filter: blur(10px);
-    transition: all 0.1s;
+    transition: background 0.1s, transform 0.1s;
 }
 
 .pass-btn:active {
     background: rgba(255, 255, 255, 0.25);
-    transform: scale(0.9);
+    transform: scale(0.92);
 }
 
 .pass-btn.empty {
@@ -960,7 +967,7 @@ header {
 }
 
 .pass-btn.delete {
-    font-size: 1.4rem;
+    font-size: 1.1rem;
 }
 
 @keyframes shake {
@@ -971,22 +978,22 @@ header {
     }
 
     25% {
-        transform: translateX(-8px);
+        transform: translateX(-6px);
     }
 
     50% {
-        transform: translateX(8px);
+        transform: translateX(6px);
     }
 
     75% {
-        transform: translateX(-8px);
+        transform: translateX(-6px);
     }
 }
 
 @keyframes fadeInDown {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-15px);
     }
 
     to {
@@ -998,6 +1005,6 @@ header {
 #passwordOverlay.hidden {
     opacity: 0;
     pointer-events: none;
-    transform: scale(1.1);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
