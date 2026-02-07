@@ -29,6 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
     });
 
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            const root = document.getElementById('rootContainer');
+            if (root) root.style.height = window.visualViewport.height + 'px';
+        });
+    }
 });
 
 
@@ -432,6 +438,14 @@ function addToOrder(item) {
     document.getElementById('numSearch').value = "";
     document.getElementById('searchResults').innerHTML = "";
     document.getElementById('searchResults').classList.remove('active');
+
+    // Auto-scroll to bottom of order list
+    setTimeout(() => {
+        const list = document.getElementById('activeOrder');
+        if (list) {
+            list.scrollTop = list.scrollHeight;
+        }
+    }, 50);
 }
 
 function updateQuantity(uid, delta) {
