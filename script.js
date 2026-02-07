@@ -183,7 +183,6 @@ function generateTables() {
         const hasOrder = (allOrders[num] && allOrders[num].length > 0);
         const card = document.createElement('div');
         card.className = `card table-card ${hasOrder ? 'has-order' : ''}`;
-        card.style.animationDelay = `${index * 0.03}s`;
         card.onclick = () => selectTable(num);
 
         card.innerHTML = `
@@ -254,11 +253,7 @@ function selectTable(num) {
 
 function updateHeaderTitle(title) {
     const el = document.getElementById('headerTitle').querySelector('.header-center');
-    el.classList.add('changing');
-    setTimeout(() => {
-        el.innerText = title;
-        el.classList.remove('changing');
-    }, 150);
+    el.innerText = title;
 }
 
 
@@ -648,15 +643,10 @@ function addToOrder(item) {
     document.getElementById('searchResults').classList.remove('active');
 
     // Auto-scroll to bottom of order list to see the new item adding
-    setTimeout(() => {
-        const list = document.getElementById('activeOrder');
-        if (list) {
-            list.scrollTo({
-                top: list.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
-    }, 50);
+    const list = document.getElementById('activeOrder');
+    if (list) {
+        list.scrollTop = list.scrollHeight;
+    }
 
     // Keep keyboard open
     // searchInput.focus(); // Removed to prevent system numpad popup
@@ -679,36 +669,14 @@ function updateQuantity(uid, delta) {
 }
 
 function removeFromOrder(uid) {
-    const row = document.getElementById(`row-${uid}`);
-    if (row && row.parentElement) {
-        const container = row.parentElement;
-        container.classList.add('item-deleted');
-        // Total duration is transition-normal * 2 (slideOut + collapseHeight)
-        // Transition-normal is 0.25s
-        setTimeout(() => {
-            allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
-            saveAndRender();
-        }, 500);
-    } else {
-        allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
-        saveAndRender();
-    }
+    allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
+    saveAndRender();
 }
 
 
 function saveAndRender(targetUid = null, type = null) {
     localStorage.setItem('waiterData', JSON.stringify(allOrders));
     renderOrder(targetUid, type);
-    if (targetUid && type === 'update') {
-        const row = document.getElementById(`row-${targetUid}`);
-        if (row) {
-            const badge = row.querySelector('.qty-badge');
-            if (badge) {
-                badge.classList.add('pulse');
-                setTimeout(() => badge.classList.remove('pulse'), 300);
-            }
-        }
-    }
 }
 
 
@@ -728,10 +696,6 @@ function renderOrder(highlightUid = null, type = null) {
 
         const rowContainer = document.createElement('div');
         rowContainer.className = 'order-row-container';
-        if (item.uid === highlightUid) {
-            if (type === 'new') rowContainer.classList.add('item-new');
-            if (type === 'update') rowContainer.classList.add('item-updated');
-        }
 
         rowContainer.innerHTML = `
             <div class="order-row" id="row-${item.uid}">
