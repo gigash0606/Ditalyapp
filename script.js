@@ -98,6 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const orderIface = document.getElementById('orderInterface');
             if (numpad.style.display === 'none' && fullKb.style.display === 'none') {
                 numpad.style.display = 'grid';
+                numpad.classList.remove('animate-fade-down');
+                numpad.classList.add('animate-fade-up');
                 orderIface.classList.add('numpad-active');
             }
         });
@@ -314,6 +316,9 @@ function backToTables() {
     const orderIface = document.getElementById('orderInterface');
 
     gridContainer.style.display = 'flex'; // Ensure flex for consistency
+    gridContainer.classList.add('animate-slide-right');
+    setTimeout(() => gridContainer.classList.remove('animate-slide-right'), 400);
+
     orderIface.style.display = 'none';
     orderIface.classList.remove('active');
 
@@ -578,6 +583,8 @@ function toggleKeyboard() {
         // Numpad -> Full Keyboard
         numpad.style.display = 'none';
         fullKb.style.display = 'flex';
+        fullKb.classList.remove('animate-fade-down');
+        fullKb.classList.add('animate-fade-up');
         orderIface.classList.remove('numpad-active');
         orderIface.classList.add('keyboard-active');
 
@@ -588,6 +595,8 @@ function toggleKeyboard() {
         // Full Keyboard -> Numpad
         fullKb.style.display = 'none';
         numpad.style.display = 'grid';
+        numpad.classList.remove('animate-fade-down');
+        numpad.classList.add('animate-fade-up');
         orderIface.classList.remove('keyboard-active');
         orderIface.classList.add('numpad-active');
     }
@@ -595,9 +604,24 @@ function toggleKeyboard() {
 }
 
 function hideKeyboard() {
-    document.getElementById('numpadContainer').style.display = 'none';
-    document.getElementById('fullKeyboardContainer').style.display = 'none';
-    document.getElementById('orderInterface').classList.remove('numpad-active', 'keyboard-active');
+    const numpad = document.getElementById('numpadContainer');
+    const fullKb = document.getElementById('fullKeyboardContainer');
+    const orderIface = document.getElementById('orderInterface');
+    const activeKb = numpad.style.display !== 'none' ? numpad : (fullKb.style.display !== 'none' ? fullKb : null);
+
+    if (activeKb) {
+        activeKb.classList.remove('animate-fade-up');
+        activeKb.classList.add('animate-fade-down');
+        // Wait for animation to finish before hiding display
+        setTimeout(() => {
+            numpad.style.display = 'none';
+            fullKb.style.display = 'none';
+            orderIface.classList.remove('numpad-active', 'keyboard-active');
+            activeKb.classList.remove('animate-fade-down');
+        }, 300);
+    } else {
+        orderIface.classList.remove('numpad-active', 'keyboard-active');
+    }
     document.getElementById('numSearch').blur();
 }
 
@@ -641,7 +665,10 @@ function numInput(key, targetInput = null) {
         if (input.id === 'numSearch') {
             document.getElementById('fullKeyboardContainer').style.display = 'none';
             document.getElementById('orderInterface').classList.remove('keyboard-active');
-            document.getElementById('numpadContainer').style.display = 'grid';
+            const numpad = document.getElementById('numpadContainer');
+            numpad.style.display = 'grid';
+            numpad.classList.remove('animate-fade-down');
+            numpad.classList.add('animate-fade-up');
             document.getElementById('orderInterface').classList.add('numpad-active');
         }
     } else {
@@ -716,8 +743,17 @@ function updateQuantity(uid, delta) {
 }
 
 function removeFromOrder(uid) {
-    allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
-    saveAndRender();
+    const row = document.getElementById(`row-container-${uid}`);
+    if (row) {
+        row.classList.add('animate-fade-out-left');
+        setTimeout(() => {
+            allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
+            saveAndRender();
+        }, 300);
+    } else {
+        allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
+        saveAndRender();
+    }
 }
 
 
@@ -750,12 +786,16 @@ function renderOrder(highlightUid = null, type = null) {
         const displayId = item.id;
 
         const rowContainer = document.createElement('div');
-        rowContainer.className = 'order-row-container';
+        const isSelected = (highlightUid && highlightUid === item.uid);
+
+        rowContainer.id = `row-container-${item.uid}`;
+        // If it's a completely new ADDITION (not an update to quantity), show the slide effect
+        rowContainer.className = `order-row-container ${isSelected && type === 'new' ? 'animate-fade-up' : ''}`;
 
         rowContainer.innerHTML = `
             <div class="order-row" id="row-${item.uid}">
                 <div class="qty-badge-box" onclick="event.stopPropagation(); updateQuantity(${item.uid}, -1)">
-                    <span class="qty-badge">${item.quantity}</span>
+                    <span class="qty-badge ${isSelected && type === 'update' ? 'animate-fade-in' : ''}">${item.quantity}</span>
                 </div>
                 <div class="item-main-info">
                     <span class="item-name">${item.name}</span>
@@ -918,10 +958,10 @@ function customTextPrompt(title, message, callback) {
 function showModal(title, content, buttons, isHtml = false) {
     const container = document.getElementById('modalContainer');
     const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
+    overlay.className = 'modal-overlay animate-fade-in';
 
     const modal = document.createElement('div');
-    modal.className = 'modal';
+    modal.className = 'modal animate-fade-up';
 
     let bodyHtml = isHtml ? content : `<p>${content}</p>`;
 
