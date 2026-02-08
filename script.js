@@ -1155,7 +1155,7 @@ function showLegalInfo() {
 
 function initPasswordScreen() {
     let enteredPin = "";
-    const correctPin = "0000";
+    const correctPin = "1302";
     const overlay = document.getElementById('passwordOverlay');
     const dots = document.querySelectorAll('.pin-dots .dot');
     const errorMsg = document.getElementById('passwordError');
@@ -1222,3 +1222,4 @@ function initPasswordScreen() {
         });
     });
 }
+
