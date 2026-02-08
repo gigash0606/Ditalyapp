@@ -1,11 +1,31 @@
+// --- FIREBASE CONFIGURATION ---
+// Replace the values below with your actual Firebase project configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDEYrnNT4fdsBaK76eWSLV8P0YHQJjsKgE",
+    authDomain: "kellnerapp-71e4a.firebaseapp.com",
+    projectId: "kellnerapp-71e4a",
+    storageBucket: "kellnerapp-71e4a.firebasestorage.app",
+    messagingSenderId: "370734045863",
+    appId: "1:370734045863:web:4f5cc0218bad4f5e429982"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 document.addEventListener('DOMContentLoaded', () => {
     initPasswordScreen();
-    generateTables();
+    // generateTables(); // Will be called by the Firebase listener
 
     // Resume session if currentTable was set
     const savedTable = localStorage.getItem('waiterCurrentTable');
     if (savedTable) {
-        selectTable(parseInt(savedTable));
+        // Wait a small bit for data to load if resuming
+        setTimeout(() => {
+            if (tables.includes(parseInt(savedTable))) {
+                selectTable(parseInt(savedTable));
+            }
+        }, 500);
     }
 
     // Register Service Worker
@@ -148,17 +168,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let tables = [];
 let allOrders = {};
-
-try {
-    tables = JSON.parse(localStorage.getItem('waiterTables')) || [];
-    allOrders = JSON.parse(localStorage.getItem('waiterData')) || {};
-} catch (e) {
-    console.error("Error loading data from localStorage", e);
-    tables = [];
-    allOrders = {};
-}
-
 let currentTable = null;
+
+// Real-time listener for all tables and orders
+db.collection("tables").onSnapshot((snapshot) => {
+    const newTables = [];
+    const newOrders = {};
+
+    snapshot.forEach((doc) => {
+        const data = doc.data();
+        const num = parseInt(doc.id);
+        newTables.push(num);
+        newOrders[num] = data.items || [];
+    });
+
+    // Update local state
+    tables = newTables.sort((a, b) => a - b);
+    allOrders = newOrders;
+
+    // Refresh UI
+    generateTables();
+    if (currentTable) {
+        renderOrder();
+    }
+}, (error) => {
+    console.error("Firestore Listen Error:", error);
+});
+
 
 function generateTables() {
     const grid = document.getElementById('tableGrid');
@@ -198,12 +234,11 @@ function generateTables() {
 function removeTable(num) {
     customConfirm("Tisch löschen", `Tisch ${num} löschen?`, (confirmed) => {
         if (confirmed) {
-            tables = tables.filter(t => t !== num);
-            localStorage.setItem('waiterTables', JSON.stringify(tables));
-            delete allOrders[num];
-            localStorage.setItem('waiterData', JSON.stringify(allOrders));
-            generateTables();
-            backToTables();
+            db.collection("tables").doc(num.toString()).delete()
+                .then(() => {
+                    backToTables();
+                })
+                .catch(err => console.error("Error deleting table:", err));
         }
     });
 }
@@ -224,10 +259,12 @@ function addTable() {
             customAlert("Fehler", "Tisch existiert bereits");
             return;
         }
-        tables.push(tableNum);
-        localStorage.setItem('waiterTables', JSON.stringify(tables));
-        generateTables();
-        selectTable(tableNum, true);
+
+        db.collection("tables").doc(tableNum.toString()).set({ items: [] })
+            .then(() => {
+                selectTable(tableNum, true);
+            })
+            .catch(err => console.error("Error adding table:", err));
     });
 }
 
@@ -685,7 +722,15 @@ function removeFromOrder(uid) {
 
 
 function saveAndRender(targetUid = null, type = null) {
-    localStorage.setItem('waiterData', JSON.stringify(allOrders));
+    if (!currentTable) return;
+
+    // Save to Firestore
+    db.collection("tables").doc(currentTable.toString()).set({
+        items: allOrders[currentTable] || []
+    }, { merge: true })
+        .catch(err => console.error("Error saving order:", err));
+
+    // Local render for instant feedback
     renderOrder(targetUid, type);
 }
 
@@ -801,9 +846,8 @@ function restackItems() {
 function clearTable() {
     customConfirm("Tisch leeren", "Alle Bestellungen löschen?", (confirmed) => {
         if (confirmed) {
-            delete allOrders[currentTable];
+            allOrders[currentTable] = [];
             saveAndRender();
-            // Stays inside table menu (no backToTables call)
         }
     });
 }
@@ -924,12 +968,17 @@ function showModal(title, content, buttons, isHtml = false) {
 function confirmDeleteAll() {
     customConfirm("Alle löschen", "Möchten Sie wirklich ALLE Tische und Daten löschen? Dies kann nicht rückgängig gemacht werden.", (confirmed) => {
         if (confirmed) {
-            tables = [];
-            allOrders = {};
-            localStorage.setItem('waiterTables', JSON.stringify(tables));
-            localStorage.setItem('waiterData', JSON.stringify(allOrders));
-            localStorage.removeItem('waiterCurrentTable');
-            generateTables();
+            // Delete all docs in tables collection from Firestore
+            db.collection("tables").get().then((snapshot) => {
+                const batch = db.batch();
+                snapshot.forEach((doc) => {
+                    batch.delete(doc.ref);
+                });
+                return batch.commit();
+            }).then(() => {
+                localStorage.removeItem('waiterCurrentTable');
+                backToTables();
+            }).catch(err => console.error("Error deleting all tables:", err));
         }
     });
 }
