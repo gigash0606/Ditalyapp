@@ -1,19 +1,42 @@
-// --- FIREBASE CONFIGURATION ---
-// Replace the values below with your actual Firebase project configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyDEYrnNT4fdsBaK76eWSLV8P0YHQJjsKgE",
-    authDomain: "kellnerapp-71e4a.firebaseapp.com",
-    projectId: "kellnerapp-71e4a",
-    storageBucket: "kellnerapp-71e4a.firebasestorage.app",
-    messagingSenderId: "370734045863",
-    appId: "1:370734045863:web:4f5cc0218bad4f5e429982"
-};
+// Firebase configuration is loaded from firebase-config.js
+// Ensure you have created that file based on the template if missing.
+
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+function preloadAnimations() {
+    const preloader = document.createElement('div');
+    preloader.id = 'preload-animations';
+    // List all critical animation classes
+    const classes = [
+        'animate-subtle-zoom-in',
+        'animate-subtle-zoom-out',
+        'animate-fade-in',
+        'animate-fade-out',
+        'animate-vibrate',
+        'animate-fall-out',
+        'animate-fade-out-left',
+        'animate-fade-in'
+    ];
+
+    classes.forEach(cls => {
+        const div = document.createElement('div');
+        div.className = cls;
+        preloader.appendChild(div);
+    });
+
+    document.body.appendChild(preloader);
+
+    // Cleanup after browser has parsed them
+    setTimeout(() => {
+        if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
+    }, 500);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    preloadAnimations();
     initPasswordScreen();
     // generateTables(); // Will be called by the Firebase listener
 
@@ -96,10 +119,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const numpad = document.getElementById('numpadContainer');
             const fullKb = document.getElementById('fullKeyboardContainer');
             const orderIface = document.getElementById('orderInterface');
+
+            // Bring back numpad if hidden
             if (numpad.style.display === 'none' && fullKb.style.display === 'none') {
                 numpad.style.display = 'grid';
-                numpad.classList.remove('animate-fade-down');
-                numpad.classList.add('animate-fade-up');
+                numpad.classList.remove('animate-fade-out');
+                numpad.classList.add('animate-fade-in');
                 orderIface.classList.add('numpad-active');
             }
         });
@@ -165,12 +190,59 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mouseup', handleKbPress);
         document.addEventListener('mouseleave', handleKbPress);
     }
+
+    // CLICK AWAY TO HIDE KEYBOARD
+    // Standard click handling for non-touch devices or fallback
+    document.addEventListener('click', (e) => {
+        handleGlobalClick(e);
+    });
+
+    // Touch handling for faster mobile response
+    document.addEventListener('touchstart', (e) => {
+        // We use touchstart for immediate responsiveness, but be careful not to conflict with scroll or button presses
+        // We'll rely on the target check in handleGlobalClick
+        handleGlobalClick(e);
+    }, { passive: true }); // passive true to allow scrolling
 });
+
+function handleGlobalClick(e) {
+    const numpad = document.getElementById('numpadContainer');
+    const fullKb = document.getElementById('fullKeyboardContainer');
+
+    // If neither is visible, nothing to do
+    const isNumpadVisible = numpad && getComputedStyle(numpad).display !== 'none';
+    const isKbVisible = fullKb && getComputedStyle(fullKb).display !== 'none';
+
+    if (!isNumpadVisible && !isKbVisible) return;
+
+    const target = e.target;
+
+    // IGNORE clicks inside:
+    // 1. The virtual keyboards themselves
+    if (numpad.contains(target) || fullKb.contains(target)) return;
+
+    // 2. The search input or wrapper
+    if (target.closest('.search-bar-wrapper') || target.id === 'numSearch') return;
+
+    // 3. The order list items (tapping + / - / delete should NOT hide kb)
+    if (target.closest('.order-row-container')) return;
+
+    // 4. Modal elements (if a modal is open, don't mess with keyboard state until closed)
+    if (document.getElementById('modalContainer').children.length > 0) return;
+
+    // If we clicked strictly on the background/container or header empty space
+    // Check if we are actually clicking on an empty area that INTENDS to close the keyboard
+    // Only close if it's explicitly the order-list background (empty space below items) or container
+    if (target.classList.contains('order-list') || target.classList.contains('container') || target.id === 'orderInterface') {
+        hideKeyboard();
+    }
+}
 
 
 let tables = [];
 let allOrders = {};
 let currentTable = null;
+let lastAction = { uid: null, type: null, timestamp: 0 };
 
 // Real-time listener for all tables and orders
 db.collection("tables").onSnapshot((snapshot) => {
@@ -191,7 +263,8 @@ db.collection("tables").onSnapshot((snapshot) => {
     // Refresh UI
     generateTables();
     if (currentTable) {
-        renderOrder();
+        // Pass the last animation state to renderOrder
+        renderOrder(lastAction.uid, lastAction.type);
     }
 }, (error) => {
     console.error("Firestore Listen Error:", error);
@@ -290,13 +363,22 @@ function selectTable(num, autoFocus = false) {
 
     renderOrder();
 
-    if (autoFocus) {
+    // Always show numpad by default when entering a table
+    const input = document.getElementById('numSearch');
+    const numpad = document.getElementById('numpadContainer');
+    const fullKb = document.getElementById('fullKeyboardContainer');
+
+    if (input) {
+        if (numpad && getComputedStyle(numpad).display === 'none' && getComputedStyle(fullKb).display === 'none') {
+            numpad.style.display = 'grid';
+            numpad.classList.remove('animate-fade-out');
+            numpad.classList.add('animate-fade-in');
+            document.getElementById('orderInterface').classList.add('numpad-active');
+        }
+        // Use a tiny timeout just to ensure the DOM is painted/transition started
         setTimeout(() => {
-            const input = document.getElementById('numSearch');
-            if (input) {
-                input.focus({ preventScroll: true });
-            }
-        }, 100);
+            input.focus({ preventScroll: true });
+        }, 50);
     }
 }
 
@@ -308,7 +390,7 @@ function updateHeaderTitle(title) {
 
 
 
-function backToTables() {
+function backToTables(animate = true) {
     currentTable = null;
     localStorage.removeItem('waiterCurrentTable');
 
@@ -316,8 +398,10 @@ function backToTables() {
     const orderIface = document.getElementById('orderInterface');
 
     gridContainer.style.display = 'flex'; // Ensure flex for consistency
-    gridContainer.classList.add('animate-slide-right');
-    setTimeout(() => gridContainer.classList.remove('animate-slide-right'), 400);
+    if (animate) {
+        gridContainer.classList.add('animate-subtle-zoom-out');
+        setTimeout(() => gridContainer.classList.remove('animate-subtle-zoom-out'), 400);
+    }
 
     orderIface.style.display = 'none';
     orderIface.classList.remove('active');
@@ -583,8 +667,8 @@ function toggleKeyboard() {
         // Numpad -> Full Keyboard
         numpad.style.display = 'none';
         fullKb.style.display = 'flex';
-        fullKb.classList.remove('animate-fade-down');
-        fullKb.classList.add('animate-fade-up');
+        fullKb.classList.remove('animate-fade-out');
+        fullKb.classList.add('animate-fade-in');
         orderIface.classList.remove('numpad-active');
         orderIface.classList.add('keyboard-active');
 
@@ -595,8 +679,8 @@ function toggleKeyboard() {
         // Full Keyboard -> Numpad
         fullKb.style.display = 'none';
         numpad.style.display = 'grid';
-        numpad.classList.remove('animate-fade-down');
-        numpad.classList.add('animate-fade-up');
+        numpad.classList.remove('animate-fade-out');
+        numpad.classList.add('animate-fade-in');
         orderIface.classList.remove('keyboard-active');
         orderIface.classList.add('numpad-active');
     }
@@ -610,14 +694,14 @@ function hideKeyboard() {
     const activeKb = numpad.style.display !== 'none' ? numpad : (fullKb.style.display !== 'none' ? fullKb : null);
 
     if (activeKb) {
-        activeKb.classList.remove('animate-fade-up');
-        activeKb.classList.add('animate-fade-down');
+        activeKb.classList.remove('animate-fade-in');
+        activeKb.classList.add('animate-fade-out');
         // Wait for animation to finish before hiding display
         setTimeout(() => {
             numpad.style.display = 'none';
             fullKb.style.display = 'none';
             orderIface.classList.remove('numpad-active', 'keyboard-active');
-            activeKb.classList.remove('animate-fade-down');
+            activeKb.classList.remove('animate-fade-out');
         }, 300);
     } else {
         orderIface.classList.remove('numpad-active', 'keyboard-active');
@@ -667,8 +751,8 @@ function numInput(key, targetInput = null) {
             document.getElementById('orderInterface').classList.remove('keyboard-active');
             const numpad = document.getElementById('numpadContainer');
             numpad.style.display = 'grid';
-            numpad.classList.remove('animate-fade-down');
-            numpad.classList.add('animate-fade-up');
+            numpad.classList.remove('animate-fade-out');
+            numpad.classList.add('animate-fade-in');
             document.getElementById('orderInterface').classList.add('numpad-active');
         }
     } else {
@@ -722,24 +806,27 @@ function addToOrder(item) {
         list.scrollTop = list.scrollHeight;
     }
 
-    // Keep keyboard open
-    // searchInput.focus(); // Removed to prevent system numpad popup
+    // Keep keyboard open and focus inside table view
+    const input = document.getElementById('numSearch');
+    if (input) {
+        input.focus({ preventScroll: true });
+    }
 }
 
 
 function updateQuantity(uid, delta) {
     const item = allOrders[currentTable].find(i => i.uid === uid);
     if (!item) return;
-    item.quantity = (item.quantity || 1) + delta;
-    if (item.quantity <= 0) {
-        allOrders[currentTable] = allOrders[currentTable].filter(i => i.uid !== uid);
+
+    const newQty = (item.quantity || 1) + delta;
+
+    if (newQty <= 0) {
+        // Trigger the removal animation instead of just deleting
+        removeFromOrder(uid);
+    } else {
+        item.quantity = newQty;
+        saveAndRender(uid, 'update');
     }
-    saveAndRender(uid, 'update');
-
-
-
-    // Keep keyboard open
-    // document.getElementById('numSearch').focus(); // Removed to prevent system numpad popup
 }
 
 function removeFromOrder(uid) {
@@ -759,6 +846,11 @@ function removeFromOrder(uid) {
 
 function saveAndRender(targetUid = null, type = null) {
     if (!currentTable) return;
+
+    // Track last action globally for animations
+    if (targetUid) {
+        lastAction = { uid: targetUid, type: type, timestamp: Date.now() };
+    }
 
     // Save to Firestore
     db.collection("tables").doc(currentTable.toString()).set({
@@ -786,11 +878,15 @@ function renderOrder(highlightUid = null, type = null) {
         const displayId = item.id;
 
         const rowContainer = document.createElement('div');
-        const isSelected = (highlightUid && highlightUid === item.uid);
+
+        // Only animate if the action is very recent (less than 2 seconds ago)
+        const isRecent = (Date.now() - lastAction.timestamp < 2000);
+        const isSelected = (highlightUid && highlightUid === item.uid) && isRecent;
 
         rowContainer.id = `row-container-${item.uid}`;
         // If it's a completely new ADDITION (not an update to quantity), show the slide effect
-        rowContainer.className = `order-row-container ${isSelected && type === 'new' ? 'animate-fade-up' : ''}`;
+        // If it's an update, show a subtle vibration
+        rowContainer.className = `order-row-container ${isSelected && type === 'new' ? 'animate-fade-up' : ''} ${isSelected && type === 'update' ? 'animate-vibrate' : ''}`;
 
         rowContainer.innerHTML = `
             <div class="order-row" id="row-${item.uid}">
@@ -1008,17 +1104,27 @@ function showModal(title, content, buttons, isHtml = false) {
 function confirmDeleteAll() {
     customConfirm("Alle löschen", "Möchten Sie wirklich ALLE Tische und Daten löschen? Dies kann nicht rückgängig gemacht werden.", (confirmed) => {
         if (confirmed) {
-            // Delete all docs in tables collection from Firestore
-            db.collection("tables").get().then((snapshot) => {
-                const batch = db.batch();
-                snapshot.forEach((doc) => {
-                    batch.delete(doc.ref);
-                });
-                return batch.commit();
-            }).then(() => {
-                localStorage.removeItem('waiterCurrentTable');
-                backToTables();
-            }).catch(err => console.error("Error deleting all tables:", err));
+            const tableCards = document.querySelectorAll('.table-card');
+            tableCards.forEach((card, index) => {
+                // Staggered fall out
+                setTimeout(() => {
+                    card.classList.add('animate-fall-out');
+                }, index * 40);
+            });
+
+            // Wait for animations to complete before deleting from DB
+            setTimeout(() => {
+                db.collection("tables").get().then((snapshot) => {
+                    const batch = db.batch();
+                    snapshot.forEach((doc) => {
+                        batch.delete(doc.ref);
+                    });
+                    return batch.commit();
+                }).then(() => {
+                    localStorage.removeItem('waiterCurrentTable');
+                    backToTables(false);
+                }).catch(err => console.error("Error deleting all tables:", err));
+            }, (tableCards.length * 40) + 400);
         }
     });
 }

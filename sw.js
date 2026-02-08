@@ -1,8 +1,9 @@
-const CACHE_NAME = 'waiterpad-v2'; // Bumped version
+const CACHE_NAME = 'waiterpad-v3'; // Bumped for new config file
 const ASSETS = [
     './',
     './index.html',
     './style.css',
+    './firebase-config.js',
     './script.js',
     './manifest.json'
 ];

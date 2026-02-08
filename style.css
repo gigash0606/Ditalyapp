@@ -105,6 +105,37 @@
     }
 }
 
+@keyframes vibrateSubtle {
+    0% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-2px);
+    }
+
+    40% {
+        transform: translateX(2px);
+    }
+
+    60% {
+        transform: translateX(-2px);
+    }
+
+    80% {
+        transform: translateX(2px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.animate-vibrate {
+    animation: vibrateSubtle 0.3s linear;
+    background-color: rgba(26, 146, 130, 0.08) !important;
+}
+
 @keyframes fadeLeft {
     from {
         opacity: 0;
@@ -149,6 +180,18 @@
     }
 }
 
+@keyframes fadeDownOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(40px) scale(0.9);
+    }
+}
+
 @keyframes fadeOutLeft {
     from {
         opacity: 1;
@@ -159,6 +202,10 @@
         opacity: 0;
         transform: translateX(-100%);
     }
+}
+
+.animate-fall-out {
+    animation: fadeDownOut 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 .animate-fade-in {
@@ -174,7 +221,7 @@
 }
 
 .animate-fade-up {
-    animation: fadeUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    animation: fadeUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
 .animate-fade-down {
@@ -197,7 +244,41 @@
     animation: slideRight 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
+@keyframes subtleZoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.93);
+        filter: blur(2px);
+    }
 
+    to {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes subtleZoomOut {
+    from {
+        opacity: 0;
+        transform: scale(1.07);
+        filter: blur(2px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+}
+
+.animate-subtle-zoom-in {
+    animation: subtleZoomIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.animate-subtle-zoom-out {
+    animation: subtleZoomOut 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
 
 
 /* Global iOS Optimizations */
@@ -224,7 +305,23 @@ body {
     background: var(--primary);
     position: fixed;
     top: 0;
+    top: 0;
     left: 0;
+}
+
+#preload-animations {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0.01;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: -1;
+}
+
+#preload-animations div {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
 }
 
 #rootContainer {
@@ -440,7 +537,7 @@ header {
 }
 
 #orderInterface.active {
-    animation: slideLeft 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    animation: subtleZoomIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 
